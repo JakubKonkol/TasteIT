@@ -5,8 +5,13 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import pl.jakubkonkol.tasteitserver.exception.AccountDoesNotExistException;
+import pl.jakubkonkol.tasteitserver.exception.ApiRequestException;
+import pl.jakubkonkol.tasteitserver.exception.IncorrectPasswordException;
 import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
 import pl.jakubkonkol.tasteitserver.model.ErrorResponse;
+
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class ErrorController {
@@ -23,6 +28,30 @@ public class ErrorController {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e) {
+        return buildErrorResponse(e, 400);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        return buildErrorResponse(e, 400);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleAccountDoesNotExistException(AccountDoesNotExistException e) {
+        return buildErrorResponse(e, 400);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleNoSuchElementException(NoSuchElementException e) {
+        return buildErrorResponse(e, 400);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleApiRequestException(ApiRequestException e) {
+        return buildErrorResponse(e, 400);
+    }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleIncorrectPasswordException(IncorrectPasswordException e) {
         return buildErrorResponse(e, 400);
     }
 

@@ -21,9 +21,9 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<PostDto> getPost(@PathVariable String postId) {
         PostDto postDto = postService.getPost(postId);
-        if (postDto == null) {
+/*        if (postDto == null) {
             throw new ResourceNotFoundException("Post not found with ID: " + postId);
-        }
+        }*/
         return ResponseEntity.ok(postDto);
     }
 
