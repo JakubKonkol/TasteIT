@@ -24,8 +24,8 @@ public class PostController {
     private final CommentService commentService;
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDto> getPost(@PathVariable String postId, @RequestHeader("Authorization") String sessionToken) {
-        PostDto postDto = postService.getPost(postId, sessionToken);
+    public ResponseEntity<PostDto> getPost(@PathVariable String postId) {
+        PostDto postDto = postService.getPost(postId);
 /*        if (postDto == null) {
             throw new ResourceNotFoundException("Post not found with ID: " + postId);
         }*/
@@ -34,16 +34,14 @@ public class PostController {
 
     @GetMapping("/feed")
     public ResponseEntity<PageDto<PostDto>> getRandomPosts(@RequestParam(defaultValue = "0") Integer page,
-                                                        @RequestParam(defaultValue = "20") Integer size,
-                                                           @RequestHeader("Authorization") String sessionToken) {
-        PageDto<PostDto> pageDto = postService.getRandomPosts(page, size, sessionToken);
+                                                        @RequestParam(defaultValue = "20") Integer size) {
+        PageDto<PostDto> pageDto = postService.getRandomPosts(page, size);
         return ResponseEntity.ok(pageDto);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<PostDto>> searchPostsByTitle(@RequestParam String query,
-                                                            @RequestHeader("Authorization") String sessionToken) {
-        List<PostDto> postDtos = postService.searchPostsByTitle(query, sessionToken);
+    public ResponseEntity<List<PostDto>> searchPostsByTitle(@RequestParam String query) {
+        List<PostDto> postDtos = postService.searchPostsByTitle(query);
         return ResponseEntity.ok(postDtos);
     }
 
