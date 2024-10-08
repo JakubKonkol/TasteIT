@@ -1,12 +1,14 @@
 package pl.jakubkonkol.tasteitserver.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.jakubkonkol.tasteitserver.dto.CommentDto;
 import pl.jakubkonkol.tasteitserver.dto.PageDto;
 import pl.jakubkonkol.tasteitserver.dto.PostDto;
+import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
 import pl.jakubkonkol.tasteitserver.model.GenericResponse;
 import pl.jakubkonkol.tasteitserver.model.Recipe;
 import pl.jakubkonkol.tasteitserver.service.CommentService;
@@ -95,13 +97,5 @@ public class PostController {
     public ResponseEntity<List<CommentDto>> getComments(@PathVariable String postId) {
         List<CommentDto> commentDtos = commentService.getComments(postId);
         return ResponseEntity.ok(commentDtos);
-    }
-
-    @GetMapping("/getPostsLikedByUser/{userId}")
-    public ResponseEntity<List<PostDto>> getPostsLikedByUser(@PathVariable String userId) {
-
-        var posts = postService.getPostsLikedByUser(userId);
-
-        return ResponseEntity.ok(posts);
     }
 }

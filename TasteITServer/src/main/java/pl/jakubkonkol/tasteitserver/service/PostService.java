@@ -9,13 +9,12 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import pl.jakubkonkol.tasteitserver.dto.PageDto;
 import pl.jakubkonkol.tasteitserver.dto.PostDto;
+import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
 import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.Recipe;
-import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -101,13 +100,6 @@ public class PostService {
     public Recipe getPostRecipe(String postId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("Post with id " + postId + " not found"));
         return post.getRecipe();
-    }
-
-    public List<PostDto> getPostsLikedByUser(String userId) {
-        var posts = postRepository.findByLikesUserId(userId);
-        return posts.stream()
-                .map(post->convertToDto(post))
-                .toList();
     }
 
     private PostDto convertToDto(Post post) {

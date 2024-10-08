@@ -8,11 +8,9 @@ import pl.jakubkonkol.tasteitserver.dto.*;
 import pl.jakubkonkol.tasteitserver.model.Ingredient;
 import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.User;
-import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -22,7 +20,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final MongoTemplate mongoTemplate;
-    private final PostRepository postRepository;
 
     public UserReturnDto getUserById(String userId) {
         User user = userRepository.findById(userId).orElseThrow(
