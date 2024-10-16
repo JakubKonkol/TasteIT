@@ -43,7 +43,7 @@ public class PostService {
 
     public void deleteAll() {
         postRepository.deleteAll();
-    }
+    } //TODO niebezpieczne
 
     public List<Post> getAll() {
         return postRepository.findAll();
