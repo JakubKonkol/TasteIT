@@ -9,4 +9,6 @@ import java.util.List;
 public interface PostRepository extends MongoRepository<Post, String> {
     List<Post> findByPostMediaTitleContainingIgnoreCase(String title);
     List<Post> findByLikesIn(List<Like> likes);
+    List<Post> findByLikesNotEmpty();
+    List<Post> findByCommentsNotEmpty();
 }
