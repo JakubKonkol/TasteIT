@@ -64,6 +64,16 @@ public class CommentService {
                 .toList();
     }
 
+    public void deleteAll() {
+        List<Post> postsWithComments = postRepository.findByCommentsNotEmpty();
+
+        for (Post post : postsWithComments) {
+            post.getComments().clear();
+        }
+        postRepository.saveAll(postsWithComments);
+        commentRepository.deleteAll();
+    }
+
     private CommentDto convertToDto(Comment comment) {
         return modelMapper.map(comment, CommentDto.class);
     }

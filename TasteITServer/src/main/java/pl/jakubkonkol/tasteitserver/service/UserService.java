@@ -93,10 +93,11 @@ public class UserService {
         User targetUser = getUserById(targetUserId);
         User currentUser = getCurrentUserBySessionToken(sessionToken);
 
+
         if (currentUser.getUserId().equals(targetUserId)) {
             throw new IllegalArgumentException("User cannot unfollow themselves.");
         }
-
+      
         if (currentUser.getFollowing().contains(targetUserId)) {
             currentUser.getFollowing().remove(targetUserId);
             targetUser.getFollowers().remove(currentUser.getUserId());
