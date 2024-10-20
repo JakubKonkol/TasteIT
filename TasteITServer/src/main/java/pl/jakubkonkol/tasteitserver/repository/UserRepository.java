@@ -2,6 +2,7 @@ package pl.jakubkonkol.tasteitserver.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import pl.jakubkonkol.tasteitserver.model.FoodList;
 import pl.jakubkonkol.tasteitserver.model.User;
 
 import java.util.Optional;

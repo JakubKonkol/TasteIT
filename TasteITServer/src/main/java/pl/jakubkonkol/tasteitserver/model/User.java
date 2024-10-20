@@ -2,6 +2,7 @@ package pl.jakubkonkol.tasteitserver.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,10 +27,13 @@ public class User implements UserDetails {
     private Authentication authentication;
     private Boolean firstLogin = true;
     private List<String> roles = List.of("USER");
+    @DBRef
     private List<Tag> mainTags = new ArrayList<Tag>();
+    @DBRef
     private List<Tag> customTags = new ArrayList<Tag>();
     private List<String> followers = new ArrayList<>();
     private List<String> following = new ArrayList<>();
+    private List<FoodList> foodLists = new ArrayList<FoodList>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

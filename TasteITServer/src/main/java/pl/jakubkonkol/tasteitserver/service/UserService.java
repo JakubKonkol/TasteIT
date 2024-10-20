@@ -112,7 +112,7 @@ public class UserService {
                 () -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
-    private User getCurrentUserBySessionToken(String sessionToken) {
+    public User getCurrentUserBySessionToken(String sessionToken) {
         return userRepository.findBySessionToken(sessionToken)
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
     }
