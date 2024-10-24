@@ -52,6 +52,11 @@ public class PostController {
         return ResponseEntity.ok(recipe);
     }
 
+    @GetMapping("/count/{userId}")
+    public long countPostsByUserId(@PathVariable String userId) {
+        return postService.countPostsByUserId(userId);
+    }
+
     @PostMapping("/{postId}/like")
     public ResponseEntity<GenericResponse> likePost(@PathVariable String postId, @RequestHeader("Authorization") final String sessionToken) {
         likeService.likePost(postId, sessionToken);

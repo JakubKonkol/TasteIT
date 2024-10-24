@@ -31,6 +31,8 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+
+
     @PutMapping("/{userId}")
     public ResponseEntity<UserReturnDto> updateUserProfile(@PathVariable String userId, @RequestBody UserProfileDto userProfileDto) {
         var user = userService.updateUserProfile(userId, userProfileDto.getDisplayName(),
