@@ -43,14 +43,21 @@ public class FoodListController {
     @GetMapping()
     public ResponseEntity<List<FoodListDto>> getAllFoodLists(
             @RequestHeader("Authorization") final String sessionToken) {
-        List<FoodListDto> foodLists = foodListService.getAllFoodLists(sessionToken); //TODO
+        List<FoodListDto> foodLists = foodListService.getAllFoodLists(sessionToken);
+        return ResponseEntity.ok(foodLists);
+    }
+
+    @GetMapping("/simple")
+    public ResponseEntity<List<FoodListDto>> getAllFoodListsSimpleInfo(
+            @RequestHeader("Authorization") final String sessionToken) {
+        List<FoodListDto> foodLists = foodListService.getAllFoodListsSimpleInfo(sessionToken);
         return ResponseEntity.ok(foodLists);
     }
 
     @PutMapping("/name/{foodListId}")
     public ResponseEntity<GenericResponse> updateFoodlistName(
             @RequestHeader("Authorization") final String sessionToken,
-            @PathVariable String foodListId, @RequestBody @Valid String name) {
+            @PathVariable String foodListId, @RequestBody FoodListDto name) {
         foodListService.updateFoodlistName(sessionToken, foodListId, name);
         return ResponseEntity.ok(GenericResponse
                 .builder()
@@ -74,8 +81,8 @@ public class FoodListController {
     @PostMapping("/post/{foodListId}")
     public ResponseEntity<GenericResponse> addPostToFoodlist(
             @RequestHeader("Authorization") final String sessionToken,
-            @PathVariable String foodListId, @RequestBody @Valid Post post) {
-        foodListService.addPostToFoodlist(sessionToken, foodListId, post);
+            @PathVariable String foodListId, @RequestBody PostDto postId) {
+        foodListService.addPostToFoodlist(sessionToken, foodListId, postId);
         return ResponseEntity.ok(GenericResponse
                 .builder()
                 .status(HttpStatus.OK.value()).
@@ -86,8 +93,8 @@ public class FoodListController {
     @DeleteMapping("/post/{foodListId}")
     public ResponseEntity<GenericResponse> deletePostInFoodlist(
             @RequestHeader("Authorization") final String sessionToken,
-            @PathVariable String foodListId, @RequestBody @Valid Post post) {
-        foodListService.deletePostInFoodlist(sessionToken, foodListId, post);
+            @PathVariable String foodListId, @RequestBody PostDto postId) {
+        foodListService.deletePostInFoodlist(sessionToken, foodListId, postId);
         return ResponseEntity.ok(GenericResponse
                 .builder()
                 .status(HttpStatus.OK.value()).

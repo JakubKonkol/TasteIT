@@ -8,6 +8,7 @@ import pl.jakubkonkol.tasteitserver.dto.PostDto;
 import pl.jakubkonkol.tasteitserver.model.FoodList;
 import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.User;
+import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class FoodListService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final PostRepository postRepository;
 
     public FoodListDto createFoodList(String sessionToken, String name) {
         var currentUser = userService.getCurrentUserBySessionToken(sessionToken);
@@ -35,9 +37,10 @@ public class FoodListService {
 
         FoodList foodList = currentUser.getFoodLists()
                 .stream()
-                .filter(f -> f.getFoodListId() == foodListId)
+                .filter(f -> f.getFoodListId().equals(foodListId))
                 .findFirst()
-                .get();
+                .orElseThrow(() -> new NoSuchElementException("FoodList with id " + foodListId + " not found"));
+
         return convertToDto(foodList);
     }
     public List<FoodListDto> getAllFoodLists(String sessionToken) {
@@ -49,38 +52,60 @@ public class FoodListService {
                 .toList();
         return foodListsDto;
     }
-    public void addPostToFoodlist(String sessionToken, String foodListId, Post post) {
+
+    public List<FoodListDto> getAllFoodListsSimpleInfo(String sessionToken) {
         var currentUser = userService.getCurrentUserBySessionToken(sessionToken);
 
+        var foodLists = currentUser.getFoodLists();
+        List<FoodListDto> foodListsDto = foodLists.stream()
+                .map(f->{
+                    var foodlistDto = new FoodListDto();
+                    foodlistDto.foodListId = f.getFoodListId();
+                    foodlistDto.name = f.getName();
+                    foodlistDto.createdDate = f.getCreatedDate();
+                    return foodlistDto;
+                })
+                .toList();
+        return foodListsDto;
+    }
+
+    public void addPostToFoodlist(String sessionToken, String foodListId, PostDto postId) {
+        var currentUser = userService.getCurrentUserBySessionToken(sessionToken);
+        Post post = postRepository.findById(postId.getPostId())
+                .orElseThrow(() -> new NoSuchElementException("Post with id " + postId + " not found"));
+
         currentUser.getFoodLists().stream()
-                .filter(f -> f.getFoodListId() == foodListId)
+                .filter(f -> f.getFoodListId().equals(foodListId))
                 .findFirst()
-                .get()
+                .orElseThrow(() -> new NoSuchElementException("FoodList with id " + foodListId + " not found"))
                 .getPostsList()
                 .add(post);
 
         userRepository.save(currentUser);
     }
-    public void deletePostInFoodlist(String sessionToken, String foodListId, Post post) {
+    public void deletePostInFoodlist(String sessionToken, String foodListId, PostDto postId) {
         var currentUser = userService.getCurrentUserBySessionToken(sessionToken);
+        var post = postRepository.findById(postId.getPostId())
+                .orElseThrow(() -> new NoSuchElementException("Post with id " + postId + " not found"));
+
         currentUser.getFoodLists().stream()
-                .filter(f -> f.getFoodListId() == foodListId)
+                .filter(f -> f.getFoodListId().equals(foodListId))
                 .findFirst()
-                .get()
+                .orElseThrow(() -> new NoSuchElementException("FoodList with id " + foodListId + " not found"))
                 .getPostsList()
                 .remove(post);
 
         userRepository.save(currentUser);
     }
 
-    public void updateFoodlistName(String sessionToken, String foodListId, String name) {
+    public void updateFoodlistName(String sessionToken, String foodListId, FoodListDto name) {
         var currentUser = userService.getCurrentUserBySessionToken(sessionToken);
 
         currentUser.getFoodLists().stream()
-                .filter(f -> f.getFoodListId() == foodListId)
+                .filter(f -> f.getFoodListId().equals(foodListId))
                 .findFirst()
-                .get()
-                .setName(name);
+                .orElseThrow(() -> new NoSuchElementException("FoodList with id " + foodListId + " not found"))
+                .setName(name.name);
 
         userRepository.save(currentUser);
     }
@@ -89,9 +114,10 @@ public class FoodListService {
         var currentUser = userService.getCurrentUserBySessionToken(sessionToken);
 
         var foodListToDelete = currentUser.getFoodLists().stream()
-                .filter(f -> f.getFoodListId() == foodListId)
+                .filter(f -> f.getFoodListId().equals(foodListId))
                 .findFirst()
-                .get();
+                .orElseThrow(() -> new NoSuchElementException("FoodList with id " + foodListId + " not found"));
+
 
         currentUser.getFoodLists().remove(foodListToDelete);
 
