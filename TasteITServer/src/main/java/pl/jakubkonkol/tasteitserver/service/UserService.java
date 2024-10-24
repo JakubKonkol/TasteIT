@@ -1,16 +1,12 @@
 package pl.jakubkonkol.tasteitserver.service;
 
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.dto.*;
-import pl.jakubkonkol.tasteitserver.model.Ingredient;
-import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
@@ -18,12 +14,12 @@ import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
     private final ModelMapper modelMapper;
 
     public UserReturnDto getUserDtoById(String userId, String sessionToken) {
@@ -32,6 +28,7 @@ public class UserService {
 
         UserReturnDto userReturnDto = convertToDto(user);
         userReturnDto.setIsFollowing(currentUser.getFollowing().contains(userId));
+        userReturnDto.setPostsCount(postRepository.countByUserId(userId));
 
         return userReturnDto;
     }
@@ -57,6 +54,13 @@ public class UserService {
         userRepository.save(user);
         return convertToDto(user);
     }
+
+//    public void updateUserPostCount(String userId) {
+//        UserReturnDto userReturnDto =
+//                convertToDto(userRepository.findById(userId).orElseThrow());
+//        userReturnDto.setPostsCount(postRepository.countByUserId(userId));
+//    }
+
 
     public UserReturnDto changeUserFirstLogin(String userId) {
         User user = getUserById(userId);

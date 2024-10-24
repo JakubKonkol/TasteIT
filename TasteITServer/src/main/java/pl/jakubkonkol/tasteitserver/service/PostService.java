@@ -1,5 +1,8 @@
 package pl.jakubkonkol.tasteitserver.service;
 
+import com.sun.jdi.IntegerValue;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -25,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -35,6 +39,7 @@ public class PostService {
     private final UserService userService;
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final MongoTemplate mongoTemplate;
 
@@ -59,6 +64,10 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("Post with id " + postId + " not found"));
         return convertToDto(post, sessionToken);
+    }
+
+    public long countPostsByUserId(String userId) {
+        return postRepository.countByUserId(userId);
     }
 
     //temp implementation
@@ -141,6 +150,9 @@ public class PostService {
 
     public PostDto createPost(PostDto postDto, String sessionToken) {
         Post post = convertToEntity(postDto);
+//        User postOwner = userRepository.findById(post.getUserId()).orElseThrow();
+//        int postsCount = postOwner.getPostsCount() + 1;
+//        postOwner.setPostsCount(postsCount);
         postRepository.save(post);
         return convertToDto(post, sessionToken);
     }
