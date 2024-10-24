@@ -23,4 +23,5 @@ public class UserReturnDto {
     private Long followersCount;
     private Long followingCount;
     private Boolean isFollowing;
+    private Integer postsCount;
 }
