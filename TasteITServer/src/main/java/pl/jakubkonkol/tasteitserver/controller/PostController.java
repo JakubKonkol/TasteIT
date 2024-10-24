@@ -9,7 +9,9 @@ import pl.jakubkonkol.tasteitserver.dto.CommentDto;
 import pl.jakubkonkol.tasteitserver.dto.PageDto;
 import pl.jakubkonkol.tasteitserver.dto.PostDto;
 import pl.jakubkonkol.tasteitserver.model.GenericResponse;
+import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.Recipe;
+import pl.jakubkonkol.tasteitserver.model.Tag;
 import pl.jakubkonkol.tasteitserver.service.CommentService;
 import pl.jakubkonkol.tasteitserver.service.LikeService;
 import pl.jakubkonkol.tasteitserver.service.PostService;
@@ -113,4 +115,7 @@ public class PostController {
         PostDto post = postService.createPost(postDto, sessionToken);
         return ResponseEntity.ok(post);
     }
+
+
+
 }
