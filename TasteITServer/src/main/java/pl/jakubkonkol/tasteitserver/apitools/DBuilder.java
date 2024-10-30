@@ -23,6 +23,7 @@ public class DBuilder {
     private final CommentService commentService;
     private final AdminUserFactory adminUserFactory;
     private final TagService tagService;
+    private final BadgeService badgeService;
 
     private static final Logger LOGGER = Logger.getLogger(DBuilder.class.getName());
 
@@ -39,6 +40,7 @@ public class DBuilder {
         tagService.deleteAll();
         LOGGER.log(Level.INFO, "Database cleared, building new one");
         tagService.saveBasicTags();
+        badgeService.saveBadgeData();
         foodFetcher.populateDBWithFood();
         ingredientFetcher.populateDBWithIngredients();
         drinkFetcher.populateDBWithDrinks();

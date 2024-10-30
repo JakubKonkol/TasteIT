@@ -8,7 +8,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.jakubkonkol.tasteitserver.dto.*;
+import pl.jakubkonkol.tasteitserver.model.Badge;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.model.projection.PostPhotoView;
 import pl.jakubkonkol.tasteitserver.model.projection.UserProfileView;
@@ -73,6 +75,13 @@ public class UserService {
         checkIfUserExists(userId);
         userRepository.updateUserTagsByUserId(userId, userTagsDto.getTags());
     }
+
+    public void updateUserBadges(String userId, UserBadgesDto userBadgesDto) { //TODO nie działa, nie zapisuje wartosci w bazie danych chuj wie czemu
+        checkIfUserExists(userId);
+        userRepository.updateUserBadgesByUserId(userId, userBadgesDto.getBadges());
+    }
+
+
 
     public void followUser(String targetUserId, String sessionToken) {
         checkIfUserExists(targetUserId);

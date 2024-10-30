@@ -5,13 +5,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
-import pl.jakubkonkol.tasteitserver.model.FoodList;
+import pl.jakubkonkol.tasteitserver.model.Badge;
 import pl.jakubkonkol.tasteitserver.model.Tag;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.model.projection.UserProfileView;
 import pl.jakubkonkol.tasteitserver.model.projection.UserShort;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +55,11 @@ public interface UserRepository extends MongoRepository<User, String>{
     @Query("{'userId' : ?0}")
     @Update("{ '$set' : { 'tags' : ?1 } }")
     void updateUserTagsByUserId(String userId, List<Tag> tags);
+
+
+    @Query("{'userId' : ?0}")
+    @Update("{ '$set' : { 'badges' : ?1 } }")
+    void updateUserBadgesByUserId(String userId, List<Badge> badges);
 
     Optional<UserProfileView> findUserByUserId(String userId);
 

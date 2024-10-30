@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.jakubkonkol.tasteitserver.dto.*;
 import pl.jakubkonkol.tasteitserver.model.GenericResponse;
+import pl.jakubkonkol.tasteitserver.service.BadgeService;
 import pl.jakubkonkol.tasteitserver.service.PostService;
 import pl.jakubkonkol.tasteitserver.service.UserService;
 
@@ -19,6 +20,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final PostService postService;
+    private final BadgeService badgeService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserReturnDto> getUserById(@PathVariable String userId, @RequestHeader("Authorization") String sessionToken) {
@@ -67,6 +69,23 @@ public class UserController {
                 message("User updated")
                 .build());
     }
+
+    @PatchMapping ("/{badgeId}/{userId}")
+//    @PutMapping ("/{badgeId}/{userId}") //TODO moze trzeba to przerobic na put mapping i zapisywac caly biekt na nowe ale to trzoche bez sensu
+    public ResponseEntity<String> grantBadgeToUser(@PathVariable String badgeId, @PathVariable String userId,
+                                                   @RequestHeader("Authorization") String sessionToken){
+        badgeService.grantBadgeToUser(badgeId, userId, sessionToken);
+        return ResponseEntity.ok(badgeId);
+    }
+//    @PatchMapping("/badges/{userId}")
+//    public ResponseEntity<GenericResponse> updateUserBadges(@PathVariable String userId, @RequestBody UserBadgesDto userBadgesDto){
+//        userService.updateUserBadges(userId, userBadgesDto);
+//        return ResponseEntity.ok(GenericResponse
+//                .builder()
+//                .status(HttpStatus.OK.value()).
+//                message("User updated")
+//                .build());
+//    }
 
     //POST jest najbardziej naturalny w tym kontekście, ponieważ follow tworzy nową relację
     // (czyli nowe połączenie między dwoma użytkownikami), a unfollow usuwa tę relację.
