@@ -70,12 +70,12 @@ public class UserController {
                 .build());
     }
 
-    @PatchMapping ("/{badgeId}/{userId}")
-//    @PutMapping ("/{badgeId}/{userId}") //TODO moze trzeba to przerobic na put mapping i zapisywac caly biekt na nowe ale to trzoche bez sensu
+//    @PatchMapping ("/{badgeId}/{userId}")
+    @PutMapping ("/{badgeId}/{userId}") //TODO moze trzeba to przerobic na put mapping i zapisywac caly biekt na nowe ale to trzoche bez sensu
     public ResponseEntity<String> grantBadgeToUser(@PathVariable String badgeId, @PathVariable String userId,
                                                    @RequestHeader("Authorization") String sessionToken){
         badgeService.grantBadgeToUser(badgeId, userId, sessionToken);
-        return ResponseEntity.ok(badgeId);
+        return ResponseEntity.ok(userId + " " + badgeId);
     }
 //    @PatchMapping("/badges/{userId}")
 //    public ResponseEntity<GenericResponse> updateUserBadges(@PathVariable String userId, @RequestBody UserBadgesDto userBadgesDto){

@@ -42,40 +42,15 @@ public class BadgeService {
     public void grantBadgeToUser(String badgeId, String userId, String sessionToken) {
         UserReturnDto userReturnDto = userService.getUserDtoById(userId, sessionToken);
         Badge badge = BadgeData.badgeData.stream().filter(b -> b.getBadgeId().equals(badgeId)).findFirst().orElse(null);
+
         if (badge != null && !userReturnDto.getBadges().contains(badge)) {
-            // Aktualizacja listy badge'y użytkownika
             List<Badge> updatedBadges = new ArrayList<>(userReturnDto.getBadges());
             updatedBadges.add(badge);
 
-            // Utwórz DTO z aktualizowaną listą badge'y i zapisz do MongoDB
-            UserBadgesDto userBadgesDto = new UserBadgesDto();
-            userBadgesDto.setBadges(updatedBadges);
-            userService.updateUserBadges(userId, userBadgesDto);
-
-            // Pobierz zaktualizowanego użytkownika, aby potwierdzić zapisanie badge'a
-            userReturnDto = userService.getUserDtoById(userId, sessionToken);
-            if (userReturnDto.getBadges().contains(badge)) {
-                LOGGER.log(Level.INFO, "Badge granted successfully.");
-            } else {
-                LOGGER.log(Level.WARNING, "Badge not found in user badges after update.");
-            }
+            userService.updateUserBadges(userId, updatedBadges);
         } else {
             LOGGER.log(Level.INFO, "Badge already granted or badge not found.");
         }
-
-//        UserReturnDto userReturnDto = userService.getUserDtoById(userId, sessionToken);
-//        Badge badge = BadgeData.badgeData.stream().filter(b -> b.getBadgeId().equals(badgeId)).findFirst().orElse(null);
-//
-//        if (!userReturnDto.getBadges().contains(badge) && badge != null){
-//            UserBadgesDto userBadgesDto = new UserBadgesDto();
-//            List<Badge> badges = List.of(badge);
-//            userReturnDto.setBadges(badges);
-//            userService.updateUserBadges(userId, userBadgesDto);
-//
-//        }
-//        else
-//            LOGGER.log(Level.INFO, "Badge already granted");
-
     }
 
 

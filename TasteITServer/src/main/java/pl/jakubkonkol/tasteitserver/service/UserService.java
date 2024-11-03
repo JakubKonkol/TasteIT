@@ -76,10 +76,22 @@ public class UserService {
         userRepository.updateUserTagsByUserId(userId, userTagsDto.getTags());
     }
 
-    public void updateUserBadges(String userId, UserBadgesDto userBadgesDto) { //TODO nie działa, nie zapisuje wartosci w bazie danych chuj wie czemu
+
+    public void updateUserBadges(String userId, List<Badge> updateBadges) { //TODO Zrobić prosty update na bazie save(pobrac zmienic zapisac) /////// JEDNAK TO DZIAŁAAAAAAAAA
         checkIfUserExists(userId);
-        userRepository.updateUserBadgesByUserId(userId, userBadgesDto.getBadges());
+        userRepository.updateUserBadgesByUserId(userId, updateBadges);                      //to zapisuje w bazie danych ale nie da sie wyswietlic get
     }
+
+//    public void updateUserBadges(String userId, List<Badge> updateBadges) {               // a to wcale nie dziala
+//        checkIfUserExists(userId);                                                        // kurwicy mozna dostac z tymi Dto
+//
+//        User user = getUserById(userId);
+//        UserReturnDto userReturnDto = convertToDto(user);
+//
+//        userReturnDto.setBadges(updateBadges);
+//
+//        userRepository.save(user);
+//    }
 
 
 
