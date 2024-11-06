@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.dto.*;
 import pl.jakubkonkol.tasteitserver.model.Badge;
-import pl.jakubkonkol.tasteitserver.model.BadgeBlueprint;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.model.projection.UserProfileView;
 import pl.jakubkonkol.tasteitserver.model.projection.UserShort;
@@ -197,7 +196,7 @@ public class UserService {
         UserReturnDto userReturnDto = modelMapper.map(user, UserReturnDto.class);
         userReturnDto.setFollowersCount((long) user.getFollowers().size());
         userReturnDto.setFollowingCount((long) user.getFollowing().size());
-
+        userReturnDto.setBadges(user.getBadges());
         return userReturnDto;
     }
 

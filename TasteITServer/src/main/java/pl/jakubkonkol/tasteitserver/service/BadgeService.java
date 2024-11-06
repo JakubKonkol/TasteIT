@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.apitools.IngredientFetcher;
 import pl.jakubkonkol.tasteitserver.data.BadgeData;
 import pl.jakubkonkol.tasteitserver.dto.BadgeDto;
-import pl.jakubkonkol.tasteitserver.dto.UserReturnDto;
 import pl.jakubkonkol.tasteitserver.model.Badge;
 import pl.jakubkonkol.tasteitserver.model.BadgeBlueprint;
+import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.repository.BadgeRepository;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 
@@ -59,18 +59,19 @@ public class BadgeService {
 
 
     public void grantBadgeToUser(String badgeId, String userId, String sessionToken) {
-        UserReturnDto userReturnDto = userService.getUserDtoById(userId, sessionToken);
+        User user = userService.getCurrentUserBySessionToken(sessionToken);
         BadgeBlueprint badgeBlueprint = BadgeData.badgeBlueprintData.stream()
                 .filter(b -> b.getBadgeId().equals(badgeId))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(); // TODO brac je z bazy a nie z pliku
 
         Badge badge = new Badge(badgeBlueprint.getBadgeId(), badgeBlueprint.getBadgeName(),
                 badgeBlueprint.getDescription(), badgeBlueprint.getImageUrl(),
-                badgeBlueprint.getGoalValue(), 0);
+                badgeBlueprint.getGoalValue(), 0); //TODO przerobic na builder @ jest juz dodana
+        // TODO w przyszłości currentValue powinno byc przypisywane autmoatycznie jakaś @Adnotacja albo metoda
 
-        if (!userReturnDto.getBadges().contains(badge)) {
-            List<Badge> updatedBadges = new ArrayList<>(userReturnDto.getBadges());
+        if (!user.getBadges().contains(badge)) {
+            List<Badge> updatedBadges = new ArrayList<>(user.getBadges());
             updatedBadges.add(badge);
 
             userService.updateUserBadges(userId, updatedBadges);

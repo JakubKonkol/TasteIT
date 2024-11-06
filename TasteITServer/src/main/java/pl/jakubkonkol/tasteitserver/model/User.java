@@ -30,8 +30,7 @@ public class User implements UserDetails {
     private List<String> roles = List.of("USER");
     @DBRef
     private List<Tag> tags = new ArrayList<>();
-    @DBRef // TODO czy tu musi byc db ref jak nie ma ich w bazie danych chyba nie
-    private List<Badge> badge = new ArrayList<>();
+    private List<Badge> badges = new ArrayList<>();
     private List<String> followers = new ArrayList<>();
     private List<String> following = new ArrayList<>();
     private List<FoodList> foodLists = new ArrayList<>();
