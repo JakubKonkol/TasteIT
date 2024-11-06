@@ -4,7 +4,6 @@ import lombok.Data;
 import pl.jakubkonkol.tasteitserver.model.Badge;
 import pl.jakubkonkol.tasteitserver.model.Tag;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,5 +23,6 @@ public class UserReturnDto {
     private Long followingCount;
     private Boolean isFollowing;
     private Long postsCount;
-    private List<Badge> badges = new ArrayList<>(); //tutaj bage ze statusem te nowe, nie blueprint
+    private List<Badge> badges = new ArrayList<>();
+//    private List<BadgeBlueprint> badgeBlueprints = new ArrayList<>(); //tutaj bage ze statusem te nowe, nie blueprint
 }

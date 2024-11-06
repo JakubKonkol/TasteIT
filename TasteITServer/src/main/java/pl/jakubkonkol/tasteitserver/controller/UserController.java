@@ -70,22 +70,13 @@ public class UserController {
                 .build());
     }
 
-//    @PatchMapping ("/{badgeId}/{userId}")
     @PutMapping ("/{badgeId}/{userId}") //TODO moze trzeba to przerobic na put mapping i zapisywac caly biekt na nowe ale to trzoche bez sensu
     public ResponseEntity<String> grantBadgeToUser(@PathVariable String badgeId, @PathVariable String userId,
                                                    @RequestHeader("Authorization") String sessionToken){
         badgeService.grantBadgeToUser(badgeId, userId, sessionToken);
         return ResponseEntity.ok(userId + " " + badgeId);
     }
-//    @PatchMapping("/badges/{userId}")
-//    public ResponseEntity<GenericResponse> updateUserBadges(@PathVariable String userId, @RequestBody UserBadgesDto userBadgesDto){
-//        userService.updateUserBadges(userId, userBadgesDto);
-//        return ResponseEntity.ok(GenericResponse
-//                .builder()
-//                .status(HttpStatus.OK.value()).
-//                message("User updated")
-//                .build());
-//    }
+
 
     //POST jest najbardziej naturalny w tym kontekście, ponieważ follow tworzy nową relację
     // (czyli nowe połączenie między dwoma użytkownikami), a unfollow usuwa tę relację.
@@ -142,3 +133,6 @@ public class UserController {
         return ResponseEntity.ok(posts);
     }
 }
+
+//POST
+//users/id/badges/id

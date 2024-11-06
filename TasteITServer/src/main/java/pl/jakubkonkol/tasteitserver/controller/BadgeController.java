@@ -1,9 +1,7 @@
 package pl.jakubkonkol.tasteitserver.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.jakubkonkol.tasteitserver.model.Badge;
 import pl.jakubkonkol.tasteitserver.service.BadgeService;
 
 @RestController

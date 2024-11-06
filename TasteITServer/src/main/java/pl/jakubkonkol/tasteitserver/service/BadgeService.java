@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.apitools.IngredientFetcher;
 import pl.jakubkonkol.tasteitserver.data.BadgeData;
 import pl.jakubkonkol.tasteitserver.dto.BadgeDto;
-import pl.jakubkonkol.tasteitserver.dto.UserBadgesDto;
 import pl.jakubkonkol.tasteitserver.dto.UserReturnDto;
 import pl.jakubkonkol.tasteitserver.model.Badge;
+import pl.jakubkonkol.tasteitserver.model.BadgeBlueprint;
 import pl.jakubkonkol.tasteitserver.repository.BadgeRepository;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 
@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -27,23 +29,47 @@ public class BadgeService {
     private final ModelMapper modelMapper;
 
     public void saveBadgeData(){
-        List<Badge> badgeDataList = BadgeData.badgeData;
-        for(int i = 0; i < BadgeData.badgeData.size(); i++){
-            Badge badge = new Badge();
-            badge.setBadgeId(badgeDataList.get(i).getBadgeId());
-            badge.setBadgeName(badgeDataList.get(i).getBadgeName());
-            badge.setDescription(badgeDataList.get(i).getDescription());
-            badge.setImageUrl(badgeDataList.get(i).getImageUrl());
-            badgeRepository.save(badge);
+        List<BadgeBlueprint> badgeBlueprintDataList = BadgeData.badgeBlueprintData;
+        Pattern pattern = Pattern.compile("\\d+"); // Liczby w opisie
+        Matcher matcher;
+
+        for (int i = 0; i < badgeBlueprintDataList.size(); i++) {
+            BadgeBlueprint badgeBlueprint = new BadgeBlueprint();
+            badgeBlueprint.setBadgeId(badgeBlueprintDataList.get(i).getBadgeId());
+            badgeBlueprint.setBadgeName(badgeBlueprintDataList.get(i).getBadgeName());
+            badgeBlueprint.setDescription(badgeBlueprintDataList.get(i).getDescription());
+            badgeBlueprint.setImageUrl(badgeBlueprintDataList.get(i).getImageUrl());
+            if (badgeBlueprint.getBadgeId().equals("badge_001")) {
+                badgeBlueprint.setGoalValue(1); // badge_001 jako jedyny nie ma liczby, ma słowo 'pierwszy'
+            } else {
+                matcher = pattern.matcher(badgeBlueprint.getDescription());
+                if (matcher.find()) {
+                    int goalValue = Integer.parseInt(matcher.group());
+                    badgeBlueprint.setGoalValue(goalValue);
+                } else {
+                    badgeBlueprint.setGoalValue(0);
+                }
+            }
+            badgeRepository.save(badgeBlueprint);
+            System.out.println(badgeBlueprint);
         }
         LOGGER.log(Level.INFO, "Badges saved");
     }
 
+
+
     public void grantBadgeToUser(String badgeId, String userId, String sessionToken) {
         UserReturnDto userReturnDto = userService.getUserDtoById(userId, sessionToken);
-        Badge badge = BadgeData.badgeData.stream().filter(b -> b.getBadgeId().equals(badgeId)).findFirst().orElse(null);
+        BadgeBlueprint badgeBlueprint = BadgeData.badgeBlueprintData.stream()
+                .filter(b -> b.getBadgeId().equals(badgeId))
+                .findFirst()
+                .orElseThrow();
 
-        if (badge != null && !userReturnDto.getBadges().contains(badge)) {
+        Badge badge = new Badge(badgeBlueprint.getBadgeId(), badgeBlueprint.getBadgeName(),
+                badgeBlueprint.getDescription(), badgeBlueprint.getImageUrl(),
+                badgeBlueprint.getGoalValue(), 0);
+
+        if (!userReturnDto.getBadges().contains(badge)) {
             List<Badge> updatedBadges = new ArrayList<>(userReturnDto.getBadges());
             updatedBadges.add(badge);
 
@@ -54,8 +80,8 @@ public class BadgeService {
     }
 
 
-    private BadgeDto convertToDto(Badge badge) {
-        return modelMapper.map(badge, BadgeDto.class);
+    private BadgeDto convertToDto(BadgeBlueprint badgeBlueprint) {
+        return modelMapper.map(badgeBlueprint, BadgeDto.class);
     }
 
 }

@@ -1,18 +1,15 @@
 package pl.jakubkonkol.tasteitserver.service;
 
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pl.jakubkonkol.tasteitserver.dto.*;
 import pl.jakubkonkol.tasteitserver.model.Badge;
+import pl.jakubkonkol.tasteitserver.model.BadgeBlueprint;
 import pl.jakubkonkol.tasteitserver.model.User;
-import pl.jakubkonkol.tasteitserver.model.projection.PostPhotoView;
 import pl.jakubkonkol.tasteitserver.model.projection.UserProfileView;
 import pl.jakubkonkol.tasteitserver.model.projection.UserShort;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
@@ -77,13 +74,13 @@ public class UserService {
     }
 
 
-    public void updateUserBadges(String userId, List<Badge> updateBadges) { //TODO Zrobić prosty update na bazie save(pobrac zmienic zapisac) /////// JEDNAK TO DZIAŁAAAAAAAAA
+    public void updateUserBadges(String userId, List<Badge> updatedBadges) { //TODO Zrobić prosty update na bazie save(pobrac zmienic zapisac) /////// JEDNAK TO DZIAŁAAAAAAAAA
         checkIfUserExists(userId);
-        userRepository.updateUserBadgesByUserId(userId, updateBadges);                      //to zapisuje w bazie danych ale nie da sie wyswietlic get
+        userRepository.updateUserBadgesByUserId(userId, updatedBadges);                      //to zapisuje w bazie danych ale nie da sie wyswietlic get
     }
 
 //    public void updateUserBadges(String userId, List<Badge> updateBadges) {               // a to wcale nie dziala
-//        checkIfUserExists(userId);                                                        // kurwicy mozna dostac z tymi Dto
+//        checkIfUserExists(userId);                                                        //
 //
 //        User user = getUserById(userId);
 //        UserReturnDto userReturnDto = convertToDto(user);

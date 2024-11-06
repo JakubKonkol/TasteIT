@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 import pl.jakubkonkol.tasteitserver.model.Badge;
+import pl.jakubkonkol.tasteitserver.model.BadgeBlueprint;
 import pl.jakubkonkol.tasteitserver.model.Tag;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.model.projection.UserProfileView;
