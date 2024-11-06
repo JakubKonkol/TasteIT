@@ -60,15 +60,19 @@ public class BadgeService {
 
     public void grantBadgeToUser(String badgeId, String userId, String sessionToken) {
         User user = userService.getCurrentUserBySessionToken(sessionToken);
-        BadgeBlueprint badgeBlueprint = BadgeData.badgeBlueprintData.stream()
-                .filter(b -> b.getBadgeId().equals(badgeId))
+        List<BadgeBlueprint> badgeBlueprints = badgeRepository.findAll();
+        BadgeBlueprint badgeBlueprint = badgeBlueprints.stream().filter(b -> b.getBadgeId().equals(badgeId))
                 .findFirst()
-                .orElseThrow(); // TODO brac je z bazy a nie z pliku
+                .orElseThrow();
 
-        Badge badge = new Badge(badgeBlueprint.getBadgeId(), badgeBlueprint.getBadgeName(),
-                badgeBlueprint.getDescription(), badgeBlueprint.getImageUrl(),
-                badgeBlueprint.getGoalValue(), 0); //TODO przerobic na builder @ jest juz dodana
-        // TODO w przyszłości currentValue powinno byc przypisywane autmoatycznie jakaś @Adnotacja albo metoda
+        Badge badge = Badge.builder()
+                .badgeId(badgeBlueprint.getBadgeId())
+                .badgeName(badgeBlueprint.getBadgeName())
+                .description(badgeBlueprint.getDescription())
+                .imageUrl(badgeBlueprint.getImageUrl())
+                .goalValue(badgeBlueprint.getGoalValue())
+                .currentValue(1) // TODO w przyszłości currentValue powinno byc przypisywane autmoatycznie jakaś @Adnotacja albo metoda
+                .build();
 
         if (!user.getBadges().contains(badge)) {
             List<Badge> updatedBadges = new ArrayList<>(user.getBadges());
