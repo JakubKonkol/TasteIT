@@ -75,20 +75,8 @@ public class UserService {
 
     public void updateUserBadges(String userId, List<Badge> updatedBadges) { //TODO Zrobić prosty update na bazie save(pobrac zmienic zapisac) /////// JEDNAK TO DZIAŁAAAAAAAAA
         checkIfUserExists(userId);
-        userRepository.updateUserBadgesByUserId(userId, updatedBadges);                      //to zapisuje w bazie danych ale nie da sie wyswietlic get
+        userRepository.updateUserBadgesByUserId(userId, updatedBadges);
     }
-
-//    public void updateUserBadges(String userId, List<Badge> updateBadges) {               // a to wcale nie dziala
-//        checkIfUserExists(userId);                                                        //
-//
-//        User user = getUserById(userId);
-//        UserReturnDto userReturnDto = convertToDto(user);
-//
-//        userReturnDto.setBadges(updateBadges);
-//
-//        userRepository.save(user);
-//    }
-
 
 
     public void followUser(String targetUserId, String sessionToken) {

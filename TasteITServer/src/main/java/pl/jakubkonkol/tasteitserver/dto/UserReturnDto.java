@@ -24,5 +24,4 @@ public class UserReturnDto {
     private Boolean isFollowing;
     private Long postsCount;
     private List<Badge> badges = new ArrayList<>();
-//    private List<BadgeBlueprint> badgeBlueprints = new ArrayList<>(); //tutaj bage ze statusem te nowe, nie blueprint
 }

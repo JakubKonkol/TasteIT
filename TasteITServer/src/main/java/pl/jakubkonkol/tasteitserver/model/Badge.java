@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-//@Document
 public class Badge {
     @Id
     private String badgeId;

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.apitools.IngredientFetcher;
 import pl.jakubkonkol.tasteitserver.data.BadgeData;
 import pl.jakubkonkol.tasteitserver.dto.BadgeDto;
+import pl.jakubkonkol.tasteitserver.dto.UserReturnDto;
 import pl.jakubkonkol.tasteitserver.model.Badge;
 import pl.jakubkonkol.tasteitserver.model.BadgeBlueprint;
 import pl.jakubkonkol.tasteitserver.model.User;
@@ -84,8 +85,22 @@ public class BadgeService {
         }
     }
 
+    public void updateBadgeProgress(String sessionToken, String badgeId) {
+        UserReturnDto userReturnDto = userService.getCurrentUserDtoBySessionToken(sessionToken);
+        List<Badge> userBadges = userReturnDto.getBadges();
+        Badge updatedBadge = userBadges.stream()
+                .filter(b -> b.getBadgeId().equals(badgeId))
+                .findFirst()
+                .orElseThrow();
+        if (updatedBadge.getCurrentValue() != updatedBadge.getGoalValue()) {
+            updatedBadge.setCurrentValue(updatedBadge.getCurrentValue()+1);
+            userBadges = List.of(updatedBadge);
+            userService.updateUserBadges(userReturnDto.getUserId(), userBadges);
+        }
+    }
 
-    private BadgeDto convertToDto(BadgeBlueprint badgeBlueprint) {
+
+    private BadgeDto convertToDto(BadgeBlueprint badgeBlueprint) { //probably won't use
         return modelMapper.map(badgeBlueprint, BadgeDto.class);
     }
 

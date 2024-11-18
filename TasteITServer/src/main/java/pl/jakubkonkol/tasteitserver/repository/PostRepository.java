@@ -26,4 +26,6 @@ public interface PostRepository extends MongoRepository<Post, String> {
     Long countByUserId(String userId);
 
     Page<PostPhotoView> findPostsByUserId(String userId, Pageable pageable);
+
+    Integer countPostsByUserId(String userid);
 }

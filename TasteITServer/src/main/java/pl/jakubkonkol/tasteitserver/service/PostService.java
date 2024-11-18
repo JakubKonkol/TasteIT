@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import pl.jakubkonkol.tasteitserver.badgeHandler.TrackBadgesProgress;
 import pl.jakubkonkol.tasteitserver.dto.PageDto;
 import pl.jakubkonkol.tasteitserver.dto.PostDto;
 import pl.jakubkonkol.tasteitserver.dto.UserReturnDto;
@@ -165,6 +166,8 @@ public class PostService {
                 .toList();
     }
 
+    @TrackBadgesProgress(badgeId = "badge_001")
+    @TrackBadgesProgress(badgeId = "badge_004")
     public PostDto createPost(PostDto postDto, String sessionToken) {
         Post post = convertToEntity(postDto);
         postRepository.save(post);
