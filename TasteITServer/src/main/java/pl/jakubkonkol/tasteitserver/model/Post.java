@@ -30,4 +30,12 @@ public class Post {
 
     @CreatedDate
     private Date createdDate;
+
+    public int getNumberOfLikes() {
+        return likes.size();
+    }
+
+    public int getNumberOfComments() {
+        return comments.size();
+    }
 }
