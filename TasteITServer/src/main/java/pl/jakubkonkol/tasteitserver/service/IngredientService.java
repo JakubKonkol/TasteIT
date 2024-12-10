@@ -47,15 +47,17 @@ public class IngredientService implements IIngredientService {
         return convertToDto(ingredient);
     }
 
-    public void save(Ingredient ingredient) {
+    public IngredientDto save(Ingredient ingredient) {
         if (ingredient == null) {
             throw new IllegalArgumentException("Ingredient cannot be null.");
         }
         if(ingredientRepository.findByNameIgnoreCase(ingredient.getName()).isEmpty()){
             ingredientRepository.save(ingredient);
         }
+
+        return convertToDto(ingredient);
     }
-    public void saveAll(List<Ingredient> ingredients) {
+    public List<IngredientDto> saveAll(List<Ingredient> ingredients) {
         if (ingredients == null) {
             throw new IllegalArgumentException("List of drinks cannot be null.");
         }
@@ -65,6 +67,8 @@ public class IngredientService implements IIngredientService {
             }
             save(ingredient);
         });
+
+        return ingredients.stream().map(i -> convertToDto(i)).toList();
     }
     public void deleteAll() {
         if (ingredientRepository.count() == 0) {
