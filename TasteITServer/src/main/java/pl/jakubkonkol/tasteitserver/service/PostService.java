@@ -211,7 +211,7 @@ public class PostService implements IPostService {
         return convertToDto(post, sessionToken);
     }
 
-    private PostDto convertToDto(Post post, String sessionToken) {
+    public PostDto convertToDto(Post post, String sessionToken) {
         PostDto postDto = modelMapper.map(post, PostDto.class);
         postDto.setLikesCount((long) post.getLikes().size());
         postDto.setCommentsCount((long) post.getComments().size());
@@ -241,5 +241,39 @@ public class PostService implements IPostService {
 
     private Post convertToEntity(PostDto postDto) {
         return modelMapper.map(postDto, Post.class);
+    }
+
+    public PageDto<PostDto> convertPostsToPageDto(String sessionToken, List<Post> posts, Pageable pageable) {
+        List<String> userIds = posts.stream()
+                .map(Post::getUserId)
+                .distinct()
+                .toList();
+
+        List<UserShort> userShorts = userService.getUserShortByIdIn(userIds);
+
+        Map<String, UserShort> userShortMap = userShorts.stream()
+                .collect(Collectors.toMap(UserShort::getUserId, userShort -> userShort));
+
+        List<PostDto> postDtos = posts.stream()
+                .map(post -> {
+                    PostDto postDto = convertToDto(post, sessionToken);
+                    addAuthorInfo(post, userShortMap, postDto);
+                    return postDto;
+                })
+                .toList();
+
+        PageImpl<PostDto> pageImpl = new PageImpl<>(postDtos, pageable, postDtos.size());
+        return getPageDto(pageImpl);
+    }
+
+    private void addAuthorInfo(Post post, Map<String, UserShort> userShortMap, PostDto postDto) {
+        UserShort userShort = userShortMap.get(post.getUserId());
+        if (userShort != null) {
+            PostAuthorDto postAuthorDto = new PostAuthorDto();
+            postAuthorDto.setUserId(userShort.getUserId());
+            postAuthorDto.setDisplayName(userShort.getDisplayName());
+            postAuthorDto.setProfilePicture(userShort.getProfilePicture());
+            postDto.setPostAuthorDto(postAuthorDto);
+        }
     }
 }
