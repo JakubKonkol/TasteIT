@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.jakubkonkol.tasteitserver.dto.PageDto;
 import pl.jakubkonkol.tasteitserver.dto.PostDto;
 import pl.jakubkonkol.tasteitserver.model.GenericResponse;
 import pl.jakubkonkol.tasteitserver.model.Post;
@@ -12,6 +13,7 @@ import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import pl.jakubkonkol.tasteitserver.service.UserPreferencesAnalysisService;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IClusteringService;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IRankerService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IUserPreferencesAnalysisService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +23,18 @@ import java.util.Map;
 @RequestMapping("/api/v1/feed")
 @RequiredArgsConstructor
 public class FeedController {
-    private final UserPreferencesAnalysisService userPreferencesAnalysisService;
+    private final IUserPreferencesAnalysisService userPreferencesAnalysisService;
     private final IRankerService rankerService;
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
     private final IClusteringService clusteringService;
 
-    @GetMapping("/rankedfeed")
-    public ResponseEntity<List<Post>> getRankedFeed(@RequestHeader("Authorization") String sessionToken) {
-        List<Post> posts = new ArrayList<>();
-        return ResponseEntity.ok(posts);
+    @GetMapping("/ranked_feed")
+    public ResponseEntity<PageDto<PostDto>> getRankedFeed(@RequestParam(defaultValue = "0") Integer page,
+                                                    @RequestParam(defaultValue = "20") Integer size,
+                                                    @RequestHeader("Authorization") String sessionToken) {
+        PageDto<PostDto> results = rankerService.rankPosts(page, size, sessionToken);
+        return ResponseEntity.ok(results);
     }
 
     @GetMapping("/allposts")

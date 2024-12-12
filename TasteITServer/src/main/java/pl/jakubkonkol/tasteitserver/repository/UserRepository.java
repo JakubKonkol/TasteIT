@@ -14,6 +14,7 @@ import pl.jakubkonkol.tasteitserver.model.projection.UserShort;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserRepository extends MongoRepository<User, String>{
@@ -67,4 +68,7 @@ public interface UserRepository extends MongoRepository<User, String>{
     @Query(value = "{ '_id' : ?0 }", fields = "{ 'preferredClusterIds' : 1 }")
     @Update("{ '$set' : { 'preferredClusterIds' : ?1 }}")
     void updateUserClusters(String userId, List<String> clusterIds);
+
+    @Query(value = "{ '_id' : ?0 }", fields = "{ 'clusterPreferences' : 1}")
+    Optional<User> findClusterPreferencesById(String userId);  // it would be good to create projection for this
 }
