@@ -2,6 +2,8 @@ package pl.jakubkonkol.tasteitserver.service;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.data.BasicTagsData;
 import pl.jakubkonkol.tasteitserver.dto.TagDto;
@@ -28,6 +30,7 @@ public class TagService implements ITagService {
         }
         return tagRepository.save(tag);
     }
+    @Cacheable(value = "allTags", key = "'allTags'")
     public List<Tag> getAll() {
         return tagRepository.findAll();
     }
@@ -36,20 +39,20 @@ public class TagService implements ITagService {
         return tagRepository.findByTagName(tagName);
     }
 
+    @Cacheable(value = "tags", key = "#tagName")
     public List<TagDto> searchTagsByName(String tagName) {
         List<Tag> tags = tagRepository.findByTagNameContainingIgnoreCase(tagName);
         return tags.stream()
                 .map(this::convertToDto)
                 .toList();
     }
+
+    @Cacheable(value = "basicTags")
     public List<Tag> getBasicTags() {
         return tagRepository.findByTagType(TagType.BASIC);
     }
 
-    /**
-     * Saves basic tags to the database.
-     * Basic tags are predefined tags that are used in the application.
-     */
+    @CacheEvict(value = {"tags", "basicTags", "'allTags'"}, allEntries = true)
     public void saveBasicTags(){
         for(String tagName: BasicTagsData.basicTags){
             Tag tag = new Tag();
@@ -58,6 +61,8 @@ public class TagService implements ITagService {
             tagRepository.save(tag);
         }
     }
+
+    @CacheEvict(value = {"tags", "basicTags",  "'allTags'"}, allEntries = true)
     public void deleteAll(){
         tagRepository.deleteAll();
     }

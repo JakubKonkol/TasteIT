@@ -46,7 +46,7 @@ public class AdminUserFactory {
             adminProfile.setBio("Admin of TasteIT");
             adminProfile.setProfilePicture("https://github.com/JakubKonkol/TasteIT/blob/master/assets/icon.png?raw=true");
             adminProfile.setBirthDate(new Date());
-            userService.updateUserProfile(adminProfile);
+            userService.updateUserProfile(adminProfile, null);
 //            userService.changeUserFirstLogin("0");
             userRepository.findById("0").ifPresent(user -> {
                 user.setRoles(roles);
