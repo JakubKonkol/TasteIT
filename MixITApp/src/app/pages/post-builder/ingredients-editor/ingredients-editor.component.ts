@@ -6,6 +6,7 @@ import {Measurement} from "../../../model/post/Measurement";
 import {SearchService} from "../../../service/search.service";
 import {IngredientService} from "../../../service/ingredient.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {PostBuilderService} from "../shared/postBuilder.service";
 
 @Component({
   selector: 'app-ingredients-editor',
@@ -20,7 +21,7 @@ export class IngredientsEditorComponent implements PostBuilderModule, OnInit, On
   private destroy$ = new Subject<void>();
   searchQuery = new Subject<string>();
   suggestions: Ingredient[] = [];
-  selectedIngredients: (Ingredient & { measurement: Measurement })[] = [];
+  selectedIngredients: Ingredient[] = [];
   showNewIngredientForm = false;
   showMeasurementModal = false;
 
@@ -34,7 +35,8 @@ export class IngredientsEditorComponent implements PostBuilderModule, OnInit, On
   constructor(
     private searchService: SearchService,
     private ingredientService: IngredientService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private postBuilderService: PostBuilderService
   ) {
     this.newIngredientForm = this.fb.group({
       name: ['', Validators.required],
@@ -52,6 +54,12 @@ export class IngredientsEditorComponent implements PostBuilderModule, OnInit, On
     this.destroy$.next();
     this.destroy$.complete();
   }
+  initializePostData() {
+    const currentPostData = this.postBuilderService.getCurrentPostData();
+    if (currentPostData.recipe.ingredientsWithMeasurements){
+      this.selectedIngredients = currentPostData.recipe.ingredientsWithMeasurements;
+    }
+  }
   ngOnInit(): void {
     this.searchQuery.pipe(
       debounceTime(300),
@@ -66,6 +74,8 @@ export class IngredientsEditorComponent implements PostBuilderModule, OnInit, On
     ).subscribe(results => {
       this.suggestions = results;
     });
+    this.initializePostData();
+    this.updateCanProceed();
   }
 
   onSearch(event: Event) {
@@ -89,6 +99,7 @@ export class IngredientsEditorComponent implements PostBuilderModule, OnInit, On
       this.showMeasurementModal = false;
       this.currentIngredient = null;
       this.measurementForm.reset();
+      this.updateCanProceed();
     }
   }
 
@@ -96,7 +107,12 @@ export class IngredientsEditorComponent implements PostBuilderModule, OnInit, On
     this.close.emit();
   }
   onNextStep(): void {
-    this.nextStep.emit();
+    this.postBuilderService.updatePostData({
+      recipe: {
+        ingredientsWithMeasurements: this.selectedIngredients
+      }
+    });
+    this.nextStep.emit(this.selectedIngredients);
   }
   onPrevStep(): void {
     this.prevStep.emit();
@@ -129,7 +145,13 @@ export class IngredientsEditorComponent implements PostBuilderModule, OnInit, On
         });
     }
   }
-
+  updateCanProceed() {
+    this.canProceed = this.selectedIngredients.length > 0;
+  }
+  deleteSelectedIngredient(index: number) {
+    this.selectedIngredients.splice(index, 1);
+    this.updateCanProceed();
+  }
 
   toggleStrengthField() {
     this.showStrengthField = this.newIngredientForm.get('isAlcohol')?.value;
