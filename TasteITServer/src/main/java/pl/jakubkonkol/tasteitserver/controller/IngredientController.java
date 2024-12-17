@@ -19,15 +19,15 @@ public class IngredientController {
     private final IIngredientService ingredientService;
 
     @PostMapping("/")
-    public ResponseEntity<String> save(@RequestBody Ingredient ingredient) {
-        ingredientService.save(ingredient);
-        return ResponseEntity.ok("Ingredient saved successfully, Id " + ingredient.getIngredientId());
+    public ResponseEntity<IngredientDto> save(@RequestBody Ingredient ingredient) {
+        var ingredientDto = ingredientService.save(ingredient);
+        return ResponseEntity.ok(ingredientDto);
     }
 
     @PostMapping("/saveAll")
-    public ResponseEntity<String> saveAll(@RequestBody List<Ingredient> ingredients) {
-        ingredientService.saveAll(ingredients);
-        return ResponseEntity.ok("Ingredients saved successfully");
+    public ResponseEntity<List<IngredientDto>> saveAll(@RequestBody List<Ingredient> ingredients) {
+        var ingredientDtoList = ingredientService.saveAll(ingredients);
+        return ResponseEntity.ok(ingredientDtoList);
     }
 
     @DeleteMapping("/{ingredientId}")
