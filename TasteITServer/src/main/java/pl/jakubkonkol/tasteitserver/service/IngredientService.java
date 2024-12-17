@@ -18,6 +18,7 @@ import pl.jakubkonkol.tasteitserver.repository.IngredientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IIngredientService;
+import org.springframework.cache.annotation.CacheEvict;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +30,7 @@ public class IngredientService implements IIngredientService {
     private final IngredientRepository ingredientRepository;
     private final ModelMapper modelMapper;
 
-    @Cacheable("ingredients")
+    @Cacheable(value = "ingredients", key = "#name")
     public Optional<Ingredient> findByName(String name) {
         if (name == null) {
             throw new IllegalArgumentException("Name cannot be null.");
@@ -37,6 +38,7 @@ public class IngredientService implements IIngredientService {
         return ingredientRepository.findByName(name);
     }
 
+    @Cacheable(value = "ingredientsById", key = "#ingredientId")
     public IngredientDto getIngredient(String ingredientId) {
         if (ingredientId == null) {
             throw new IllegalArgumentException("Id cannot be null.");
@@ -48,6 +50,7 @@ public class IngredientService implements IIngredientService {
         return convertToDto(ingredient);
     }
 
+    @CacheEvict(value = {"ingredients", "ingredientsById", "ingredientsPages", "ingredientsAll"}, allEntries = true)
     public void save(Ingredient ingredient) {
         if (ingredient == null) {
             throw new IllegalArgumentException("Ingredient cannot be null.");
@@ -56,6 +59,8 @@ public class IngredientService implements IIngredientService {
             ingredientRepository.save(ingredient);
         }
     }
+
+    @CacheEvict(value = {"ingredients", "ingredientsById", "ingredientsPages", "ingredientsAll"}, allEntries = true)
     public void saveAll(List<Ingredient> ingredients) {
         if (ingredients == null) {
             throw new IllegalArgumentException("List of drinks cannot be null.");
@@ -67,6 +72,7 @@ public class IngredientService implements IIngredientService {
             save(ingredient);
         });
     }
+    @CacheEvict(value = {"ingredients", "ingredientsById", "ingredientsPages", "ingredientsAll"}, allEntries = true)
     public void deleteAll() {
         if (ingredientRepository.count() == 0) {
             throw new IllegalStateException("No ingredients to delete.");
@@ -74,6 +80,7 @@ public class IngredientService implements IIngredientService {
         ingredientRepository.deleteAll();
     }
 
+    @CacheEvict(value = {"ingredients", "ingredientsById", "ingredientsPages", "ingredientsAll"}, allEntries = true)
     public void deleteById(String ingredientId) {
         if (ingredientId == null || ingredientId.isEmpty()) {
             throw new IllegalArgumentException("Ingredient ID cannot be null or empty.");
@@ -84,6 +91,7 @@ public class IngredientService implements IIngredientService {
         ingredientRepository.deleteById(ingredientId);
     }
 
+    @Cacheable(value = "ingredientsAll", key = "'AllIngredients'")
     public List<IngredientDto> getAll() {
         List<Ingredient> ingredients = ingredientRepository.findAll();
         return ingredients.stream()
@@ -101,10 +109,10 @@ public class IngredientService implements IIngredientService {
 //
 //    }
 
+    @Cacheable(value = "ingredientsPages", key = "'search_' + #name + '_page_' + #page + '_size_' + #size")
     public PageDto<IngredientDto> searchIngredientsByName(String name, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<IngredientSearchView> ingredients = ingredientRepository.findByNameContainingIgnoreCase(name, pageable);
-
         return getIngredientDtoFromIngredientSearchView(ingredients, pageable);
     }
 

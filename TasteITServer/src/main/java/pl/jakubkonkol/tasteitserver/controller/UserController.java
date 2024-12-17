@@ -39,8 +39,8 @@ public class UserController {
     }
 
     @PutMapping()
-    public ResponseEntity<GenericResponse> updateUserProfile(@Valid @RequestBody UserProfileDto userProfileDto) {
-        userService.updateUserProfile(userProfileDto);
+    public ResponseEntity<GenericResponse> updateUserProfile(@Valid @RequestBody UserProfileDto userProfileDto, @RequestHeader("Authorization") String sessionToken) {
+        userService.updateUserProfile(userProfileDto, sessionToken);
         return ResponseEntity.ok(GenericResponse
                 .builder()
                 .status(HttpStatus.OK.value()).
@@ -49,8 +49,8 @@ public class UserController {
     }
 
     @PatchMapping("/first-login/{userId}")
-    public ResponseEntity<GenericResponse> changeUserFirstLogin(@PathVariable String userId) {
-        userService.changeUserFirstLogin(userId);
+    public ResponseEntity<GenericResponse> changeUserFirstLogin(@PathVariable String userId, @RequestHeader("Authorization") String sessionToken) {
+        userService.changeUserFirstLogin(userId, sessionToken);
         return ResponseEntity.ok(GenericResponse
                 .builder()
                 .status(HttpStatus.OK.value()).
@@ -59,8 +59,8 @@ public class UserController {
     }
 
     @PatchMapping("/tags/{userId}")
-    public ResponseEntity<GenericResponse> updateUserTags(@PathVariable String userId, @RequestBody UserTagsDto userTagsDto) {
-        userService.updateUserTags(userId, userTagsDto);
+    public ResponseEntity<GenericResponse> updateUserTags(@PathVariable String userId, @RequestBody UserTagsDto userTagsDto, @RequestHeader("Authorization") String sessionToken) {
+        userService.updateUserTags(userId, userTagsDto, sessionToken);
         return ResponseEntity.ok(GenericResponse
                 .builder()
                 .status(HttpStatus.OK.value()).
