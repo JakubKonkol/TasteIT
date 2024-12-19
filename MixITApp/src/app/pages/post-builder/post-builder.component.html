@@ -3,7 +3,6 @@
   <div class="content">
     <app-post-photo
       *ngSwitchCase="1"
-      [postData]="postData"
       (imageUploaded)="onUpdatePhoto($event)"
       (close)="onClose()"
     />
@@ -12,22 +11,28 @@
       *ngSwitchCase="2"
       (close)="onClose()"
       (prevStep)="prevStep()"
-      (nextStep)="onUpdateDetails($event)"
+      (nextStep)="nextStep()"
     />
 
     <app-ingredients-editor
       *ngSwitchCase="3"
       (close)="onClose()"
       (prevStep)="prevStep()"
-      (nextStep)="onUpdateIngredients($event)"
+      (nextStep)="nextStep()"
 
     />
 
     <app-recipe-editor
       *ngSwitchCase="4"
+      (close)="onClose()"
+      (prevStep)="prevStep()"
+      (nextStep)="nextStep()"
     />
     <app-post-summary
       *ngSwitchCase="5"
+      (close)="onClose()"
+      (prevStep)="prevStep()"
+      (nextStep)="onSubmit()"
     />
   </div>
 </ng-container>

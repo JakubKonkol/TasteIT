@@ -6,6 +6,7 @@ import {EPostType} from "../../../model/post/EPostType";
 import {TagService} from "../../../service/tag.service";
 import {PostBuilderModule} from "../shared/PostBuilderModule";
 import {TagType} from "../../../model/user/TagType";
+import {PostBuilderService} from "../shared/postBuilder.service";
 
 @Component({
   selector: 'app-post-details',
@@ -29,7 +30,8 @@ export class PostDetailsComponent implements PostBuilderModule, OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private tagService: TagService
+    private tagService: TagService,
+    private postBuilderService: PostBuilderService
   ) {}
 
   async ngOnInit() {
@@ -37,6 +39,20 @@ export class PostDetailsComponent implements PostBuilderModule, OnInit {
     await this.loadTags();
     this.setupTagSearch();
     this.setupFormValidation();
+    this.loadInitialData();
+  }
+  private loadInitialData() {
+    const currentPostData = this.postBuilderService.getCurrentPostData();
+    if (currentPostData.postMedia) {
+      this.postForm.patchValue({
+        title: currentPostData.postMedia.title,
+        description: currentPostData.postMedia.description,
+        category: currentPostData.postType
+      });
+      if (currentPostData.tags) {
+        this.selectedTags = currentPostData.tags;
+      }
+    }
   }
 
   private initializeForm() {
@@ -160,9 +176,18 @@ export class PostDetailsComponent implements PostBuilderModule, OnInit {
   onContinue() {
     const formValue = this.getFormValue();
     if (formValue) {
+      this.postBuilderService.updatePostData({
+        postMedia: {
+          title: formValue.postMedia.title,
+          description: formValue.postMedia.description
+        },
+        tags: formValue.tags,
+        postType: formValue.postType
+      });
       this.nextStep.emit(formValue);
     }
   }
+
 
   onPrevStep() {
     this.prevStep.emit();

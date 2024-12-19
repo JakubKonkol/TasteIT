@@ -90,7 +90,7 @@ export class DrinkViewComponent implements OnInit, OnDestroy{
   }
 
    getIngredients(): Ingredient[] {
-    return this.recipe.ingredientsWithMeasurements.map((ingredient) => {
+    return this.recipe.ingredientsWithMeasurements?.map((ingredient) => {
       return ingredient;
     }) || [];
   }

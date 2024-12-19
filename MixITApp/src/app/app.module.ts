@@ -92,6 +92,7 @@ import { RecipeEditorComponent } from './pages/post-builder/recipe-editor/recipe
 import { PostDetailsComponent } from './pages/post-builder/post-details/post-details.component';
 import { PostSummaryComponent } from './pages/post-builder/post-summary/post-summary.component';
 import { PBNavigationComponent } from './pages/post-builder/pbnavigation/pbnavigation.component';
+import {PostBuilderService} from "./pages/post-builder/shared/postBuilder.service";
 @NgModule({
   declarations: [
     AppComponent,
@@ -197,7 +198,8 @@ import { PBNavigationComponent } from './pages/post-builder/pbnavigation/pbnavig
     TagService,
     FoodlistService,
     AddToFoodlistFactoryService,
-    MatDialog
+    MatDialog,
+    PostBuilderService
   ],
   bootstrap: [AppComponent]
 })

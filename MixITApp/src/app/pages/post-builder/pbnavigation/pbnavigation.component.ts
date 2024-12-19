@@ -27,6 +27,6 @@ export class PBNavigationComponent {
   protected readonly onsubmit = onsubmit;
 
   onSubmit() {
-
+    this.nextStepEmitter.emit();
   }
 }
