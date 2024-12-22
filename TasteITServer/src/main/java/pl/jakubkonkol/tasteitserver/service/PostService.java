@@ -45,7 +45,8 @@ public class PostService {
     }
 
     public List<Post> saveAll(List<Post> posts) {
-        return postRepository.saveAll(Objects.requireNonNull(posts, "List of posts cannot be null."));
+        return postRepository.saveAll(
+                Objects.requireNonNull(posts, "List of posts cannot be null."));
     }
 
     public void deleteAll() {
@@ -58,7 +59,8 @@ public class PostService {
 
     public PostDto getPost(String postId, String sessionToken) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("Post with id " + postId + " not found"));
+                .orElseThrow(
+                        () -> new NoSuchElementException("Post with id " + postId + " not found"));
         return convertToDto(post, sessionToken);
     }
 
@@ -83,7 +85,8 @@ public class PostService {
     }
 
     //if title consists few words use '%20' between them in get request
-    public PageDto<PostDto> searchPosts(String title, String postType, String sessionToken, int page, int size) {
+    public PageDto<PostDto> searchPosts(String title, String postType, String sessionToken,
+                                        int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Query query = new Query();
 
@@ -102,6 +105,24 @@ public class PostService {
         return getPostDtoPageDto(posts, total, pageable, sessionToken);
     }
 
+    public PageDto<PostDto> searchPostsWithAnyIngredient(List<String> ingredientNames,
+                                                         String sessionToken,
+                                                         int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PostPhotoView> postPage = postRepository.findByAnyIngredientInRecipe(ingredientNames, pageable);
+
+        return getPostDtoPageDtoFromPostPhotoView(postPage, pageable);
+    }
+
+    public PageDto<PostDto> searchPostsWithAllIngredients(List<String> ingredientNames,
+                                                          String sessionToken,
+                                                          int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PostPhotoView> postPage = postRepository.findByIngredientsSubset(ingredientNames, pageable);
+
+        return getPostDtoPageDtoFromPostPhotoView(postPage, pageable);
+    }
+
     public PageDto<PostDto> searchPostsByTagName(String tagId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<PostPhotoView> postPage = postRepository.findPostsByTagsTagId(tagId, pageable);
@@ -117,7 +138,8 @@ public class PostService {
         return getPostDtoPageDtoFromPostPhotoView(postsPhotoViewPage, pageable);
     }
 
-    private PageDto<PostDto> getPostDtoPageDto(List<Post> posts, Long total, Pageable pageable, String sessionToken) {
+    private PageDto<PostDto> getPostDtoPageDto(List<Post> posts, Long total, Pageable pageable,
+                                               String sessionToken) {
         List<PostDto> postDtos = posts.stream()
                 .map(post -> convertToDto(post, sessionToken))
                 .toList();
@@ -127,7 +149,8 @@ public class PostService {
         return getPageDto(pageImpl);
     }
 
-    public PageDto<PostDto> getPostDtoPageDtoFromPostPhotoView(Page<PostPhotoView> postsPhotoViewPage, Pageable pageable) {
+    public PageDto<PostDto> getPostDtoPageDtoFromPostPhotoView(
+            Page<PostPhotoView> postsPhotoViewPage, Pageable pageable) {
         List<PostDto> postDtos = postsPhotoViewPage.stream().map(post -> {
             PostDto postDto = new PostDto();
             postDto.setPostId(post.getPostId());
@@ -135,7 +158,8 @@ public class PostService {
             return postDto;
         }).toList();
 
-        PageImpl<PostDto> pageImpl = new PageImpl<>(postDtos, pageable, postsPhotoViewPage.getTotalElements());
+        PageImpl<PostDto> pageImpl = new PageImpl<>(postDtos, pageable,
+                postsPhotoViewPage.getTotalElements());
 
         return getPageDto(pageImpl);
     }
@@ -152,7 +176,8 @@ public class PostService {
     }
 
     public Recipe getPostRecipe(String postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("Post with id " + postId + " not found"));
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new NoSuchElementException("Post with id " + postId + " not found"));
         return post.getRecipe();
     }
 
@@ -161,7 +186,7 @@ public class PostService {
         var posts = postRepository.findByLikesIn(likes);
 
         return posts.stream()
-                .map(post->convertToDto(post, sessionToken))
+                .map(post -> convertToDto(post, sessionToken))
                 .toList();
     }
 
@@ -176,25 +201,28 @@ public class PostService {
         postDto.setLikesCount((long) post.getLikes().size());
         postDto.setCommentsCount((long) post.getComments().size());
 
-        var currentUser = userService.getCurrentUserDtoBySessionToken(sessionToken); //todo optymalizacja dla wielu postow
-        var like = likeRepository.findByPostIdAndUserId(post.getPostId(), currentUser.getUserId()); //todo optymalizacja dla wielu postow
+        var currentUser = userService.getCurrentUserDtoBySessionToken(
+                sessionToken); //todo optymalizacja dla wielu postow
+        var like = likeRepository.findByPostIdAndUserId(post.getPostId(),
+                currentUser.getUserId()); //todo optymalizacja dla wielu postow
 
-        if(like.isEmpty()){
+        if (like.isEmpty()) {
             postDto.setLikedByCurrentUser(false);
             // nie wiem czy ustawialbym to pole w tym miejscu moze np w getRandomPosts i getPost? jest to jednak metoda konkretnie do konwersji
             //" Aby wiedzieć, czy dany użytkownik jest obserwowany przez innego użytkownika,
             // potrzebujesz dodatkowego kontekstu, czyli danych o użytkowniku aktualnie zalogowanym (np. currentUser).
             // Ta informacja nie powinna być dostępna bezpośrednio w metodzie konwertującej."
-        }
-        else {
+        } else {
             postDto.setLikedByCurrentUser(true);
         }
         return postDto;
     }
 
-    public PageDto<PostDto> getPostsExcludingIngredients(List<String> ingredientNames, Integer page, Integer size) {
+    public PageDto<PostDto> getPostsExcludingIngredients(List<String> ingredientNames, Integer page,
+                                                         Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<PostPhotoView> postPage = postRepository.findByExcludedIngredients(ingredientNames, pageable);
+        Page<PostPhotoView> postPage = postRepository.findByExcludedIngredients(ingredientNames,
+                pageable);
 
         return getPostDtoPageDtoFromPostPhotoView(postPage, pageable);
     }
