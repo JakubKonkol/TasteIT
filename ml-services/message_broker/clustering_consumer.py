@@ -5,7 +5,7 @@ from datetime import datetime
 from kafka import KafkaConsumer, KafkaProducer
 from content_clustering_service.content_clustering_service import ContentClusteringService
 
-KAFKA_BROKER_URL = os.getenv("KAFKA_BROKER_URL", "localhost:29092")
+KAFKA_BROKER_URL = os.getenv("KAFKA_BROKER_URL", "localhost:9092")
 REQUEST_TOPIC = "clustering-request"
 RESPONSE_TOPIC = "clustering-response"
 
