@@ -1,7 +1,6 @@
 package pl.jakubkonkol.tasteitserver.service;
 
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -10,16 +9,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Caching;
 import pl.jakubkonkol.tasteitserver.dto.*;
 import pl.jakubkonkol.tasteitserver.model.Ingredient;
 import pl.jakubkonkol.tasteitserver.model.Tag;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.model.UserAction;
+import pl.jakubkonkol.tasteitserver.model.enums.NotificationType;
 import pl.jakubkonkol.tasteitserver.model.projection.PostPhotoView;
 import pl.jakubkonkol.tasteitserver.model.projection.UserProfileView;
 import pl.jakubkonkol.tasteitserver.model.projection.UserShort;
@@ -32,6 +30,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +42,8 @@ public class UserService implements IUserService {
     private final IngredientService ingredientService;
     private final TagService tagService;
     private final UserActionRepository userActionRepository;
+    private final NotificationEventPublisher notificationEventPublisher;
+    private static final java.util.logging.Logger LOGGER = Logger.getLogger(UserService.class.getName());
 
     @Cacheable(value = "userById", key = "#userId")
     public UserReturnDto getUserDtoById(String userId, String sessionToken) {
@@ -54,7 +56,6 @@ public class UserService implements IUserService {
         return userReturnDto;
     }
 
-    @Cacheable(value = "userById", key = "#userId")
     public UserReturnDto getUserProfileView(String userId, String sessionToken) {
         UserProfileView userProfileView = userRepository.findUserByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
@@ -118,6 +119,7 @@ public class UserService implements IUserService {
         if (!currentUser.getFollowing().contains(targetUserId)) {
             userRepository.addFollowing(currentUser.getUserId(), targetUserId);
             userRepository.addFollower(targetUserId, currentUser.getUserId());
+            handleFollowNotification(currentUser.getUserId(), targetUserId);
         } else {
             throw new IllegalStateException("User is already following the target user.");
         }
@@ -306,6 +308,19 @@ public class UserService implements IUserService {
                 .toList();
 
         return userRepository.findAllById(activeUserIds);
+    }
+
+    private void handleFollowNotification(String followerId, String targetUserId) {
+        try {
+            notificationEventPublisher.publishNotification(
+                    NotificationType.NEW_FOLLOWER,
+                    targetUserId,
+                    followerId,
+                    null
+            );
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING,"Failed to send follow notification", e);
+        }
     }
 }
 
