@@ -2,6 +2,7 @@ package pl.jakubkonkol.tasteitserver.service;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.annotation.RegisterAction;
 import pl.jakubkonkol.tasteitserver.dto.CommentDto;
@@ -12,6 +13,7 @@ import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.repository.CommentRepository;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import pl.jakubkonkol.tasteitserver.service.interfaces.ICommentService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IPostRankingService;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 
 import java.util.List;
@@ -22,9 +24,11 @@ public class CommentService implements ICommentService {
     private final CommentRepository commentRepository;
     private final IUserService userService;
     private final PostRepository postRepository;
+    private final IPostRankingService postRankingService;
     private final ModelMapper modelMapper;
 
     @RegisterAction(actionType = "COMMENT_POST")
+    @CacheEvict(value = "postById", key = "#postId")
     public CommentDto addComment(String postId, CommentDto commentDto, String token) {
         UserReturnDto userByToken = userService.getCurrentUserDtoBySessionToken(token);
         Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
@@ -42,10 +46,12 @@ public class CommentService implements ICommentService {
         Comment savedComment = commentRepository.save(comment);
         post.getComments().add(savedComment);
         postRepository.save(post);
+        postRankingService.clearRankedPostsCacheForUser(userByToken.getUserId());
 
         return convertToDto(savedComment);
     }
 
+    @CacheEvict(value = "postById", key = "#postId")
     public void deleteComment(String postId, String commentId, String token) {
         UserReturnDto userByToken = userService.getCurrentUserDtoBySessionToken(token);
         Comment comment = commentRepository.findById(commentId)
@@ -59,6 +65,7 @@ public class CommentService implements ICommentService {
         post.getComments().remove(comment);
         postRepository.save(post);
         commentRepository.delete(comment);
+        postRankingService.clearRankedPostsCacheForUser(userByToken.getUserId());
     }
 
     public List<CommentDto> getComments(String postId) {

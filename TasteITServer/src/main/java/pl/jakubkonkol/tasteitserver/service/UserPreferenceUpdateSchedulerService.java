@@ -13,10 +13,7 @@ import pl.jakubkonkol.tasteitserver.event.PreferenceUpdateRequiredEvent;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.model.enums.PreferenceUpdateReason;
 import pl.jakubkonkol.tasteitserver.model.value.UpdateTask;
-import pl.jakubkonkol.tasteitserver.service.interfaces.IUserActivityAnalyzerService;
-import pl.jakubkonkol.tasteitserver.service.interfaces.IUserPreferenceUpdateSchedulerService;
-import pl.jakubkonkol.tasteitserver.service.interfaces.IUserPreferencesAnalysisService;
-import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +28,7 @@ public class UserPreferenceUpdateSchedulerService implements IUserPreferenceUpda
     private final IUserPreferencesAnalysisService preferencesAnalysisService;
     private final IUserActivityAnalyzerService userActivityAnalyzerService;
     private final IUserService userService;
+    private final IPostRankingService postRankingService;
 
     // Service for recording metrics and monitoring system performance
     private final MeterRegistry meterRegistry;
@@ -131,6 +129,7 @@ public class UserPreferenceUpdateSchedulerService implements IUserPreferenceUpda
                     preferencesAnalysisService.requestPreferenceAnalysis(task.userId());
                     meterRegistry.counter("preference_updates_successful").increment();
                     userActivityAnalyzerService.resetUserActivity(task.userId());
+                    postRankingService.clearRankedPostsCacheForUser(task.userId());
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Error processing update for user " + task.userId() + " error: " + e);
                     meterRegistry.counter("preference_updates_failed").increment();

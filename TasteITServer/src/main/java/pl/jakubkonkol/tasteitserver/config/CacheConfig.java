@@ -50,11 +50,21 @@ public class CacheConfig {
     }
 
     @Bean
+    public Caffeine rankedPostsCacheConfig() {
+        return Caffeine.newBuilder()
+                .expireAfterWrite(60, TimeUnit.MINUTES)
+                .initialCapacity(100)
+                .maximumSize(1000)
+                .recordStats();
+    }
+
+    @Bean
     public CacheManager cacheManager(
             Caffeine userCacheConfig,
             Caffeine postCacheConfig,
             Caffeine tagCacheConfig,
-            Caffeine ingredientCacheConfig
+            Caffeine ingredientCacheConfig,
+            Caffeine rankedPostsCacheConfig
     ) {
         CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
         
@@ -83,6 +93,8 @@ public class CacheConfig {
         caffeineCacheManager.registerCustomCache("ingredientsById", ingredientCacheConfig.build());
         caffeineCacheManager.registerCustomCache("ingredientsAll", ingredientCacheConfig.build());
         caffeineCacheManager.registerCustomCache("ingredientsPages", ingredientCacheConfig.build());
+
+        caffeineCacheManager.registerCustomCache("rankedPosts", rankedPostsCacheConfig.build());
 
         return caffeineCacheManager;
     }

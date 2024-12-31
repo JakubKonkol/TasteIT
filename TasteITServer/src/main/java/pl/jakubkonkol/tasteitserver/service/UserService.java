@@ -202,7 +202,6 @@ public class UserService implements IUserService {
         return pageDto;
     }
 
-    @Cacheable(value = "userById", key = "#userId")
     public User getUserById(String userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new NoSuchElementException("User with id " + userId + " not found"));
