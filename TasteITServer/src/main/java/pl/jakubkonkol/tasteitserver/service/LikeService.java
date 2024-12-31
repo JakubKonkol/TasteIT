@@ -7,19 +7,24 @@ import pl.jakubkonkol.tasteitserver.dto.UserReturnDto;
 import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
 import pl.jakubkonkol.tasteitserver.model.Like;
 import pl.jakubkonkol.tasteitserver.model.Post;
+import pl.jakubkonkol.tasteitserver.model.enums.NotificationType;
 import pl.jakubkonkol.tasteitserver.repository.LikeRepository;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import pl.jakubkonkol.tasteitserver.service.interfaces.ILikeService;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
 public class LikeService implements ILikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
+    private final NotificationEventPublisher notificationEventPublisher;
     private final IUserService userService;
+    private static final java.util.logging.Logger LOGGER = Logger.getLogger(LikeService.class.getName());
 
     @RegisterAction(actionType = "LIKE_POST")
     public void likePost(String postId, String token) {
@@ -39,6 +44,7 @@ public class LikeService implements ILikeService {
         likeRepository.save(like);
         post.getLikes().add(like);
         postRepository.save(post);
+        handleLikeNotification(post, userByToken.getUserId());
     }
 
     public void unlikePost(String postId, String token) {
@@ -60,5 +66,20 @@ public class LikeService implements ILikeService {
         }
         postRepository.saveAll(postsWithLikes);
         likeRepository.deleteAll();
+    }
+
+    private void handleLikeNotification(Post post, String likerId) {
+        if (!post.getUserId().equals(likerId)) {
+            try {
+                notificationEventPublisher.publishNotification(
+                        NotificationType.POST_LIKE,
+                        post.getUserId(),
+                        likerId,
+                        post.getPostId()
+                );
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Failed to send like notification", e);
+            }
+        }
     }
 }
