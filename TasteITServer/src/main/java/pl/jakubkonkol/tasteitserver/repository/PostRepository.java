@@ -32,9 +32,11 @@ public interface PostRepository extends MongoRepository<Post, String> {
 
     // Znajdź posty zawierające co najmniej jeden z podanych składników
     @Query("{ 'recipe.ingredientsWithMeasurements.name': { $in: ?0 } }")
-    Page<PostPhotoView> findByAnyIngredientInRecipe(List<String> ingredientNames, Pageable pageable);
+    List<Post> findByAnyIngredientInRecipe(List<String> ingredientNames);
 
     @Query("{ 'recipe.ingredientsWithMeasurements.name': { $not: { $elemMatch: { $nin: ?0 } } } }")
-    Page<PostPhotoView> findByIngredientsSubset(List<String> ingredientNames, Pageable pageable);
+    List<Post> findByIngredientsSubset(List<String> ingredientNames);
 
+
+    List<Post> findAll();
 }

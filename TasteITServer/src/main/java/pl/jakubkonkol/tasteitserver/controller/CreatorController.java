@@ -21,20 +21,16 @@ public class CreatorController {
     private final IngredientService ingredientService;
 
     @GetMapping("/any")
-    public ResponseEntity<PageDto<PostDto>> searchPostsWithAnyIngredient(@RequestParam List<String> ingredientNames,
-                                                        @RequestHeader("Authorization") String sessionToken,
-                                                        @RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "20") int size) {
-        PageDto<PostDto> pageDto = postService.searchPostsWithAnyIngredient(ingredientNames, sessionToken, page, size);
-        return ResponseEntity.ok(pageDto);
+    public ResponseEntity<List<PostDto>> searchPostsWithAnyIngredient(@RequestParam List<String> ingredientNames,
+                                                        @RequestHeader("Authorization") String sessionToken) {
+        var foundPostsDto = postService.searchPostsWithAnyIngredient(ingredientNames, sessionToken);
+        return ResponseEntity.ok(foundPostsDto);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<PageDto<PostDto>> searchPostsWithAllIngredients(@RequestParam List<String> ingredientNames,
-                                                                              @RequestHeader("Authorization") String sessionToken,
-                                                                              @RequestParam(defaultValue = "0") int page,
-                                                                              @RequestParam(defaultValue = "20") int size) {
-        PageDto<PostDto> pageDto = postService.searchPostsWithAllIngredients(ingredientNames, sessionToken, page, size);
+    public ResponseEntity<List<PostDto>> searchPostsWithAllIngredients(@RequestParam List<String> ingredientNames,
+                                                                              @RequestHeader("Authorization") String sessionToken) {
+        var pageDto = postService.searchPostsWithAllIngredients(ingredientNames, sessionToken);
         return ResponseEntity.ok(pageDto);
     }
 }

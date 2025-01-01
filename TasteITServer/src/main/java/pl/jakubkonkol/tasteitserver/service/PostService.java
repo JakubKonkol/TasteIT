@@ -26,9 +26,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -105,22 +104,59 @@ public class PostService {
         return getPostDtoPageDto(posts, total, pageable, sessionToken);
     }
 
-    public PageDto<PostDto> searchPostsWithAnyIngredient(List<String> ingredientNames,
-                                                         String sessionToken,
-                                                         int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<PostPhotoView> postPage = postRepository.findByAnyIngredientInRecipe(ingredientNames, pageable);
+    public List<PostDto> searchPostsWithAnyIngredient(List<String> ingredientNames,
+                                                   String sessionToken) {
+        var foundPosts = postRepository.findAll();
 
-        return getPostDtoPageDtoFromPostPhotoView(postPage, pageable);
+        Set<String> ingredientNamesLower = ingredientNames.stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+
+        // Filtrowanie i sortowanie postów
+        var filteredPosts = foundPosts.stream()
+                .filter(post -> post.getRecipe() != null && post.getRecipe().getIngredientsWithMeasurements() != null)
+                .filter(post -> post.getRecipe().getIngredientsWithMeasurements().stream()
+                        .anyMatch(ingredient -> ingredientNamesLower.contains(ingredient.getName().toLowerCase())))
+                .map(post -> new PostWithMatchCount(post, (int) post.getRecipe().getIngredientsWithMeasurements().stream()
+                        .filter(ingredient -> ingredientNamesLower.contains(ingredient.getName().toLowerCase()))
+                        .count()))
+                .sorted(Comparator.comparingInt(PostWithMatchCount::getMatchCount).reversed())
+                .map(PostWithMatchCount::getPost)
+                .collect(Collectors.toList());
+
+        List<PostDto> filteredPostsDtos = filteredPosts.stream()
+                .map(post -> convertToDto(post, sessionToken))
+                .toList();
+
+        return filteredPostsDtos;
     }
 
-    public PageDto<PostDto> searchPostsWithAllIngredients(List<String> ingredientNames,
-                                                          String sessionToken,
-                                                          int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<PostPhotoView> postPage = postRepository.findByIngredientsSubset(ingredientNames, pageable);
+    public List<PostDto> searchPostsWithAllIngredients(List<String> ingredientNames,
+                                                       String sessionToken) {
+        var foundPosts = postRepository.findAll();
 
-        return getPostDtoPageDtoFromPostPhotoView(postPage, pageable);
+        Set<String> ingredientNamesLower = ingredientNames.stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+
+        // Filtrowanie i sortowanie postów
+        var filteredPosts = foundPosts.stream()
+                .filter(post -> post.getRecipe() != null && post.getRecipe().getIngredientsWithMeasurements() != null
+                        && !post.getRecipe().getIngredientsWithMeasurements().isEmpty())
+                .filter(post -> post.getRecipe().getIngredientsWithMeasurements().stream()
+                        .allMatch(ingredient -> ingredientNamesLower.contains(ingredient.getName().toLowerCase())))
+                .map(post -> new PostWithMatchCount(post, (int) post.getRecipe().getIngredientsWithMeasurements().stream()
+                        .filter(ingredient -> ingredientNamesLower.contains(ingredient.getName().toLowerCase()))
+                        .count()))
+                .sorted(Comparator.comparingInt(PostWithMatchCount::getMatchCount).reversed())
+                .map(PostWithMatchCount::getPost)
+                .collect(Collectors.toList());
+
+        List<PostDto> filteredPostsDtos = filteredPosts.stream()
+                .map(post -> convertToDto(post, sessionToken))
+                .toList();
+
+        return filteredPostsDtos;
     }
 
     public PageDto<PostDto> searchPostsByTagName(String tagId, Integer page, Integer size) {
@@ -229,5 +265,24 @@ public class PostService {
 
     private Post convertToEntity(PostDto postDto) {
         return modelMapper.map(postDto, Post.class);
+    }
+
+    //klasa pomocnicza
+    private static class PostWithMatchCount {
+        private final Post post;
+        private final int matchCount;
+
+        public PostWithMatchCount(Post post, int matchCount) {
+            this.post = post;
+            this.matchCount = matchCount;
+        }
+
+        public Post getPost() {
+            return post;
+        }
+
+        public int getMatchCount() {
+            return matchCount;
+        }
     }
 }
