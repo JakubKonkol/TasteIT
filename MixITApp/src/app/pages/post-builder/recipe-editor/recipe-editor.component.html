@@ -1,0 +1,45 @@
+<div class="container">
+  <header class="header">
+    <h1 class="header-title">Add Recipe Instructions</h1>
+  </header>
+  <div class="instructions-container">
+    <form [formGroup]="instructionsForm" (ngSubmit)="addStep()">
+      <div class="form-group">
+        <label for="currentStep">Step {{ currentStepNumber }}</label>
+        <textarea
+          id="currentStep"
+          formControlName="currentStep"
+          placeholder="Enter detailed instruction for this step"
+          rows="4"
+        ></textarea>
+        <div *ngIf="instructionsForm.get('currentStep')?.invalid && instructionsForm.get('currentStep')?.touched" class="error-message">
+          Step description must be at least 10 characters long
+        </div>
+      </div>
+
+      <button type="submit" class="add-step-btn" [disabled]="instructionsForm.get('currentStep')?.invalid">
+        Add Step
+      </button>
+    </form>
+
+    <div class="added-steps" *ngIf="steps.size > 0">
+      <h3>Current Instructions:</h3>
+      <ul>
+        <li *ngFor="let stepEntry of getOrderedSteps()">
+          <span class="step-number">Step {{ stepEntry[0] }}:</span>
+          <span class="step-description">{{ stepEntry[1] }}</span>
+          <button class="remove-step-btn" (click)="removeStep(stepEntry[0])">Remove</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <app-pbnavigation
+    [currentStep]="4"
+    [canProceed]="canProceed"
+    [isLastStep]="false"
+    (closeEmitter)="onClose()"
+    (nextStepEmitter)="onContinue()"
+    (prevStepEmitter)="onPrevStep()"
+  />
+</div>

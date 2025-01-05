@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {AngularFireStorage} from "@angular/fire/compat/storage";
-import {finalize, Observable} from "rxjs";
+import {catchError, finalize, from, Observable, throwError} from "rxjs";
 
 @Injectable({
   providedIn: "root"
@@ -33,12 +33,23 @@ export class StorageUploadService{
    * @param fileUrl URL pliku do usunięcia
    * @returns Observable po zakończeniu usuwania
    */
-  deleteFile(fileUrl: string): Observable<void>{
-    return new Observable((observer) => {
-      this.storage.ref(fileUrl).delete().subscribe(() => {
-        observer.next();
-        observer.complete();
-      });
-    })
+  deleteFile(fileUrl: string): Observable<void> {
+    if (!fileUrl || !fileUrl.includes('firebase')) {
+      console.error('Invalid Firebase Storage URL');
+      return throwError(() => new Error('Invalid Firebase Storage URL'));
+    }
+
+    try {
+      const storageRef = this.storage.refFromURL(fileUrl);
+      return from(storageRef.delete()).pipe(
+        catchError(error => {
+          console.error('Error deleting file:', error);
+          return throwError(() => error);
+        })
+      );
+    } catch (error) {
+      console.error('Error creating storage reference:', error);
+      return throwError(() => error);
+    }
   }
 }

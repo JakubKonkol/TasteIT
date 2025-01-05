@@ -1,0 +1,100 @@
+<div class="post-details">
+  <header class="header">
+    <h1 class="header-title">Tell us more about your post</h1>
+  </header>
+
+  <form [formGroup]="postForm" class="post-form">
+    <!-- Title Input -->
+    <div class="input-group">
+      <input
+        type="text"
+        formControlName="title"
+        placeholder="Your post title"
+        class="input-field"
+        [class.error]="postForm.get('title')?.touched && postForm.get('title')?.invalid"
+      >
+      <div class="error-hint" *ngIf="postForm.get('title')?.touched && postForm.get('title')?.invalid">
+        Title is required (min 3 characters)
+      </div>
+    </div>
+
+    <!-- Description Input -->
+    <div class="input-group">
+      <textarea
+        formControlName="description"
+        placeholder="Tell us more about your post"
+        class="input-field input-field--multiline"
+        rows="4"
+        [class.error]="postForm.get('description')?.touched && postForm.get('description')?.invalid"
+      ></textarea>
+      <div class="error-hint" *ngIf="postForm.get('description')?.touched && postForm.get('description')?.invalid">
+        Description is required (min 5 characters)
+      </div>
+    </div>
+
+    <!-- Category Selection -->
+    <div class="input-group">
+      <div class="select-wrapper">
+        <select formControlName="category" class="input-field">
+          <option [ngValue]="null" disabled selected>Select post category</option>
+          <option *ngFor="let type of postTypes" [value]="type">
+            {{type}}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tags Search and Selection -->
+    <div class="input-group">
+      <label class="input-label">Add tags to reach more people</label>
+      <div class="tags-search">
+        <input
+          type="text"
+          [formControl]="tagSearchControl"
+          class="input-field"
+          placeholder="Search or create tags..."
+          (input)="onTagSearch($event)"
+        >
+
+        <div class="tags-suggestions" *ngIf="(filteredTags.length || isCreatingTag) && tagSearchControl.value">
+          <!-- Existing tags -->
+          <button
+            type="button"
+            *ngFor="let tag of filteredTags"
+            (click)="addTag(tag)"
+            class="tag-suggestion"
+          >
+            {{tag.tagName}}
+          </button>
+
+          <!-- Create new tag option -->
+          <button
+            type="button"
+            *ngIf="isCreatingTag && searchTerm"
+            (click)="createAndAddTag(searchTerm)"
+            class="tag-suggestion tag-suggestion--create"
+          >
+            Create tag "{{searchTerm}}"
+          </button>
+        </div>
+      </div>
+
+      <!-- Selected Tags -->
+      <div class="selected-tags" *ngIf="selectedTags.length">
+        <div class="tag-chip" *ngFor="let tag of selectedTags">
+          <span>{{tag.tagName}}</span>
+          <button type="button" class="tag-remove" (click)="removeTag(tag)">×</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <app-pbnavigation
+    [currentStep]="2"
+    [canProceed]="readyToContinue"
+    [isLastStep]="false"
+    (closeEmitter)="onClose()"
+    (prevStepEmitter)="onPrevStep()"
+    (nextStepEmitter)="onContinue()"
+  />
+</div>

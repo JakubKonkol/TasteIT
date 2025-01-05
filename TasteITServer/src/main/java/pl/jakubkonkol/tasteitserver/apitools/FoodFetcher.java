@@ -12,17 +12,13 @@ import pl.jakubkonkol.tasteitserver.factory.PostMealFactory;
 import pl.jakubkonkol.tasteitserver.model.Ingredient;
 import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.User;
-import pl.jakubkonkol.tasteitserver.repository.UserRepository;
-import pl.jakubkonkol.tasteitserver.service.IngredientService;
-import pl.jakubkonkol.tasteitserver.service.PostService;
-import pl.jakubkonkol.tasteitserver.service.UserService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IIngredientService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IPostService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,14 +32,14 @@ import java.util.logging.Logger;
 public class FoodFetcher {
     private static final Logger LOGGER = Logger.getLogger(FoodFetcher.class.getName());
 
-    private final IngredientService ingredientService;
-    private final PostService postService;
+    private final IIngredientService ingredientService;
+    private final IPostService postService;
     private final OkHttpClient client;
     private final IngredientMealFactory ingredientFactory;
     private final PostMealFactory postFactory;
     private final String foodFinderURL = "https://themealdb.com/api/json/v1/1/search.php?f=";
     private final String ingredientListURL = "https://www.themealdb.com/api/json/v1/1/list.php?i=list";
-    private final UserService userService;
+    private final IUserService userService;
 //    private final ExecutorService executor = Executors.newFixedThreadPool(3);
 
     /**

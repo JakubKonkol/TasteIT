@@ -11,5 +11,4 @@ public class IngredientDto {
     private boolean isAlcohol;
     private String strength;
     private String imageURL;
-    private Measurement measurement;
 }

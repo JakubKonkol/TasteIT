@@ -86,6 +86,13 @@ import { FoodlistViewComponent } from './pages/foodlist-view/foodlist-view.compo
 import {MatDialog, MatDialogModule} from "@angular/material/dialog";
 import { ConfirmDialogComponent } from './components/dialogs/confirm-dialog/confirm-dialog.component';
 import { ChangeFlNameDialogComponent } from './components/dialogs/change-fl-name-dialog/change-fl-name-dialog.component';
+import { PostPhotoComponent } from './pages/post-builder/post-photo/post-photo.component';
+import { IngredientsEditorComponent } from './pages/post-builder/ingredients-editor/ingredients-editor.component';
+import { RecipeEditorComponent } from './pages/post-builder/recipe-editor/recipe-editor.component';
+import { PostDetailsComponent } from './pages/post-builder/post-details/post-details.component';
+import { PostSummaryComponent } from './pages/post-builder/post-summary/post-summary.component';
+import { PBNavigationComponent } from './pages/post-builder/pbnavigation/pbnavigation.component';
+import {PostBuilderService} from "./pages/post-builder/shared/postBuilder.service";
 @NgModule({
   declarations: [
     AppComponent,
@@ -126,6 +133,12 @@ import { ChangeFlNameDialogComponent } from './components/dialogs/change-fl-name
     ConfirmDialogComponent,
     ChangeFlNameDialogComponent,
     InstructionsViewComponent,
+    PostPhotoComponent,
+    IngredientsEditorComponent,
+    RecipeEditorComponent,
+    PostDetailsComponent,
+    PostSummaryComponent,
+    PBNavigationComponent,
   ],
   imports: [
     BrowserModule,
@@ -185,7 +198,8 @@ import { ChangeFlNameDialogComponent } from './components/dialogs/change-fl-name
     TagService,
     FoodlistService,
     AddToFoodlistFactoryService,
-    MatDialog
+    MatDialog,
+    PostBuilderService
   ],
   bootstrap: [AppComponent]
 })

@@ -30,7 +30,7 @@ export class PostService {
 
   async getFeed(page: number, size: number): Promise<Post[]> {
     try {
-      const res = await taste_api.get(`/post/feed?page=${page}&size=${size}`);
+      const res = await taste_api.get(`/feed/ranked_feed?page=${page}&size=${size}`);
       const posts = res.data.content as Post[];
       this.setFeed([...this.getFeedState(), ...posts]);
       return posts;
@@ -121,7 +121,7 @@ export class PostService {
   }
   async createPost(post: Post): Promise<Post> {
     try {
-      const res = await taste_api.post('/post', post);
+      const res = await taste_api.post('/post/create', post);
       return res.data as Post;
     } catch (error: any) {
       this.logger.logError('Error creating post', error.response?.data || error);

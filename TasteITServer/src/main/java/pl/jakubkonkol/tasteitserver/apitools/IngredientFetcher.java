@@ -9,7 +9,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
-import pl.jakubkonkol.tasteitserver.service.IngredientService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IIngredientService;
 
 import java.awt.image.LookupOp;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class IngredientFetcher {
     private static final Logger LOGGER = Logger.getLogger(IngredientFetcher.class.getName());
     private final String ingredientFinderURL = "https://www.thecocktaildb.com/api/json/v1/1/search.php?i=";
     private final String ingredientListURL = "https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list";
-    private final IngredientService ingredientService;
+    private final IIngredientService ingredientService;
     private final IngredientDrinkFactory ingredientFactory;
     private final OkHttpClient client;
 

@@ -9,15 +9,15 @@ import pl.jakubkonkol.tasteitserver.dto.AuthenticationSuccessTokenDto;
 import pl.jakubkonkol.tasteitserver.dto.UserCreationRequestDto;
 import pl.jakubkonkol.tasteitserver.dto.UserLoginRequestDto;
 import pl.jakubkonkol.tasteitserver.model.GenericResponse;
-import pl.jakubkonkol.tasteitserver.service.AuthenticationService;
 import pl.jakubkonkol.tasteitserver.model.User;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IAuthenticationService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-    private final AuthenticationService authenticationService;
+    private final IAuthenticationService authenticationService;
 
     @PostMapping("/register")
     public ResponseEntity<User> createUser(@Valid @RequestBody final UserCreationRequestDto userCreationRequest) {

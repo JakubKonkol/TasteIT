@@ -1,0 +1,44 @@
+.navigation {
+  padding: 1rem 1rem 38px;
+  background: var(--theme-color-900);
+  border-top: 1px solid var(--theme-color-800);
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-button {
+  flex: 1;
+  height: 50px;
+  border: none;
+  background: var(--theme-color-600);
+  color: var(--theme-color-50);
+  border-radius: var(--soft-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-button:active:not(:disabled) {
+  background: var(--theme-color-500);
+  transform: scale(0.96);
+}
+
+.nav-button:disabled {
+  background: var(--theme-color-800);
+  color: var(--theme-color-600);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.nav-button .material-icons {
+  font-size: 28px;
+}
+

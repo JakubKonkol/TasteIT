@@ -3,6 +3,7 @@ package pl.jakubkonkol.tasteitserver.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import pl.jakubkonkol.tasteitserver.annotation.RegisterAction;
 import pl.jakubkonkol.tasteitserver.dto.FoodListDto;
 import pl.jakubkonkol.tasteitserver.dto.PostDto;
 import pl.jakubkonkol.tasteitserver.model.FoodList;
@@ -10,6 +11,8 @@ import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IFoodListService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -17,10 +20,10 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class FoodListService {
+public class FoodListService implements IFoodListService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
-    private final UserService userService;
+    private final IUserService userService;
     private final PostRepository postRepository;
 
     public FoodListDto createFoodList(String sessionToken, String name) {
@@ -70,6 +73,7 @@ public class FoodListService {
         return foodListsDto;
     }
 
+    @RegisterAction(actionType = "ADD_TO_FOODLIST")
     public void addPostToFoodlist(String sessionToken, String foodListId, PostDto postId) {
         var currentUser = userService.getCurrentUserBySessionToken(sessionToken);
         Post post = postRepository.findById(postId.getPostId())

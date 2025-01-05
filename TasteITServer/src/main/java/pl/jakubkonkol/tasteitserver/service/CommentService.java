@@ -3,6 +3,7 @@ package pl.jakubkonkol.tasteitserver.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import pl.jakubkonkol.tasteitserver.annotation.RegisterAction;
 import pl.jakubkonkol.tasteitserver.dto.CommentDto;
 import pl.jakubkonkol.tasteitserver.dto.UserReturnDto;
 import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
@@ -10,17 +11,20 @@ import pl.jakubkonkol.tasteitserver.model.Comment;
 import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.repository.CommentRepository;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
+import pl.jakubkonkol.tasteitserver.service.interfaces.ICommentService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CommentService {
+public class CommentService implements ICommentService {
     private final CommentRepository commentRepository;
-    private final UserService userService;
+    private final IUserService userService;
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
 
+    @RegisterAction(actionType = "COMMENT_POST")
     public CommentDto addComment(String postId, CommentDto commentDto, String token) {
         UserReturnDto userByToken = userService.getCurrentUserDtoBySessionToken(token);
         Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found"));

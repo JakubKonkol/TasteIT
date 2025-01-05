@@ -4,6 +4,8 @@ import taste_api from "../api/taste_api";
 import {EPostType} from "../model/post/EPostType";
 import {User} from "../model/user/User";
 import {Tag} from "../model/user/Tag";
+import {Ingredient} from "../model/post/Ingredient";
+import {from, map, Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -59,7 +61,16 @@ export class SearchService {
       return Promise.reject(error.response?.data || error);
     }
   }
+  searchIngredients(query: string, page?: number, size?: number): Observable<Ingredient[]> {
+    const params: any = { query };
+    if (page !== undefined) params.page = page;
+    if (size !== undefined) params.size = size;
 
+    return from(taste_api.get('search/ingredients', { params }))
+      .pipe(
+        map(res => res.data.content as Ingredient[])
+      );
+  }
 
 
 

@@ -1,0 +1,42 @@
+<div class="container">
+  <header class="header">
+    <h1 class="header-title">Post Summary</h1>
+  </header>
+
+  <div class="summary-content">
+    <section class="post-details">
+      <h2 class="post-title">{{ getPostData().postMedia.title }}</h2>
+      <p class="post-description">{{ getPostData().postMedia.description }}</p>
+    </section>
+
+    <section class="ingredients-section">
+      <h3 class="section-title">Ingredients</h3>
+      <div class="ingredients-list">
+        <div *ngFor="let ingredient of getPostData().recipe.ingredientsWithMeasurements" class="ingredient-item">
+          <span class="ingredient-name">{{ ingredient.name }}</span>
+          <span class="ingredient-amount">
+            {{ ingredient.measurement?.value }} {{ ingredient.measurement?.unit }}
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="tags-section">
+      <h3 class="section-title">Tags</h3>
+      <div class="tags-container">
+        <span *ngFor="let tag of getPostData().tags" class="tag-item">
+          {{ tag.tagName }}
+        </span>
+      </div>
+    </section>
+  </div>
+
+  <app-pbnavigation
+    [currentStep]="5"
+    [canProceed]="canProceed"
+    [isLastStep]="true"
+    (closeEmitter)="onClose()"
+    (nextStepEmitter)="onContinue()"
+    (prevStepEmitter)="onPrevStep()"
+  />
+</div>

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.jakubkonkol.tasteitserver.dto.IngredientDto;
 import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
 import pl.jakubkonkol.tasteitserver.model.Ingredient;
-import pl.jakubkonkol.tasteitserver.service.IngredientService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IIngredientService;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,37 +16,31 @@ import java.util.Optional;
 @RequestMapping("/api/v1/ingredient")
 @RequiredArgsConstructor
 public class IngredientController {
-    private final IngredientService ingredientService;
+    private final IIngredientService ingredientService;
 
-    @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody Ingredient ingredient) {
-        ingredientService.save(ingredient);
-        return ResponseEntity.ok("Ingredient saved successfully, Id " + ingredient.getIngredientId());
+    @PostMapping("/")
+    public ResponseEntity<IngredientDto> save(@RequestBody Ingredient ingredient) {
+        var ingredientDto = ingredientService.save(ingredient);
+        return ResponseEntity.ok(ingredientDto);
     }
 
     @PostMapping("/saveAll")
-    public ResponseEntity<String> saveAll(@RequestBody List<Ingredient> ingredients) {
-        ingredientService.saveAll(ingredients);
-        return ResponseEntity.ok("Ingredients saved successfully");
+    public ResponseEntity<List<IngredientDto>> saveAll(@RequestBody List<Ingredient> ingredients) {
+        var ingredientDtoList = ingredientService.saveAll(ingredients);
+        return ResponseEntity.ok(ingredientDtoList);
     }
 
-    @DeleteMapping("/deleteById")
+    @DeleteMapping("/{ingredientId}")
     public ResponseEntity<String> deleteById(@PathVariable String ingredientId) {
         ingredientService.deleteById(ingredientId);
         return ResponseEntity.ok("Ingredient deleted succesfully, Id: " + ingredientId);
     }
 
-    @DeleteMapping("/deleteAll")
+    @DeleteMapping("/")
     public ResponseEntity<String> deleteAll() {
         ingredientService.deleteAll();
         return ResponseEntity.ok("Ingredients deleted succesfully");
     }
-
-// na razie nie potrzebna
-//    @GetMapping("/search")
-//    public ResponseEntity<List<IngredientDto>> searchIngredientByName(@RequestParam String name) {
-//        return ResponseEntity.ok(ingredientService.searchByName(name));
-//    }
 
     @GetMapping("/{ingredientId}")
     public ResponseEntity<IngredientDto> getIngredient(@PathVariable String ingredientId) {
@@ -57,7 +51,7 @@ public class IngredientController {
         return ResponseEntity.ok(ingredientDto);
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/")
     public ResponseEntity<List<IngredientDto>> getAll() {
         return ResponseEntity.ok(ingredientService.getAll());
 

@@ -210,14 +210,11 @@
   align-items: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
-.active{
-  background-color: darkred;
+.liked > mat-icon{
+  color: #ff4081 !important;
 }
 .button-actions-small > mat-icon{
   color: var(--theme-color-950);
-
-}
-.maxwidth{
 
 }
 .btn{
@@ -236,6 +233,12 @@
   align-items: center;
   gap: 1rem;
 }
-.active > *{
+.animate-like {
+  animation: likeAnimation 0.3s ease;
+}
 
+@keyframes likeAnimation {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
 }

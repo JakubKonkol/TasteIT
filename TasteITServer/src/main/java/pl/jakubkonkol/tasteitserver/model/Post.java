@@ -27,6 +27,8 @@ public class Post {
     private List<Like> likes = new ArrayList<>();
     @DBRef
     private List<Comment> comments = new ArrayList<>();
+    @DBRef
+    private List<Cluster> clusters = new ArrayList<>();
 
     @CreatedDate
     private Date createdDate;

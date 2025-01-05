@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.jakubkonkol.tasteitserver.dto.*;
-import pl.jakubkonkol.tasteitserver.model.enums.PostType;
-import pl.jakubkonkol.tasteitserver.service.IngredientService;
-import pl.jakubkonkol.tasteitserver.service.PostService;
-import pl.jakubkonkol.tasteitserver.service.TagService;
-import pl.jakubkonkol.tasteitserver.service.UserService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IIngredientService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IPostService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.ITagService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 
 import java.util.List;
 
@@ -16,10 +15,10 @@ import java.util.List;
 @RequestMapping("/api/v1/search")
 @RequiredArgsConstructor
 public class SearchController {
-    private final PostService postService;
-    private final UserService userService;
-    private final TagService tagService;
-    private final IngredientService ingredientService;
+    private final IPostService postService;
+    private final IUserService userService;
+    private final ITagService tagService;
+    private final IIngredientService ingredientService;
 
     @GetMapping("/posts")
     public ResponseEntity<PageDto<PostDto>> searchPosts(@RequestParam String query,

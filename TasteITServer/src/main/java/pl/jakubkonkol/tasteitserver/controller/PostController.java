@@ -6,17 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.jakubkonkol.tasteitserver.dto.CommentDto;
-import pl.jakubkonkol.tasteitserver.dto.FoodListDto;
 import pl.jakubkonkol.tasteitserver.dto.PageDto;
 import pl.jakubkonkol.tasteitserver.dto.PostDto;
-import pl.jakubkonkol.tasteitserver.model.FoodList;
 import pl.jakubkonkol.tasteitserver.model.GenericResponse;
-import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.Recipe;
-import pl.jakubkonkol.tasteitserver.service.FoodListService;
-import pl.jakubkonkol.tasteitserver.service.CommentService;
-import pl.jakubkonkol.tasteitserver.service.LikeService;
-import pl.jakubkonkol.tasteitserver.service.PostService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.ICommentService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.ILikeService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IPostService;
 
 import java.util.List;
 
@@ -24,10 +20,9 @@ import java.util.List;
 @RequestMapping("/api/v1/post")
 @RequiredArgsConstructor
 public class PostController {
-    private final PostService postService;
-    private final LikeService likeService;
-    private final CommentService commentService;
-    private final FoodListService foodListService;
+    private final IPostService postService;
+    private final ILikeService likeService;
+    private final ICommentService commentService;
 
     @GetMapping("/{postId}")
     public ResponseEntity<PostDto> getPost(@PathVariable String postId, @RequestHeader("Authorization") String sessionToken) {

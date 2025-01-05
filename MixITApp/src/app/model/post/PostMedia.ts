@@ -1,5 +1,5 @@
 export interface PostMedia{
-  title: string;
-  description: string;
-  pictures: string[];
+  title?: string;
+  description?: string;
+  pictures?: string[];
 }

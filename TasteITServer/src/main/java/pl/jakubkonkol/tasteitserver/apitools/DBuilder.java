@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import pl.jakubkonkol.tasteitserver.factory.AdminUserFactory;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 import pl.jakubkonkol.tasteitserver.service.*;
+import pl.jakubkonkol.tasteitserver.service.interfaces.*;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -17,12 +18,12 @@ public class DBuilder {
     private final FoodFetcher foodFetcher;
     private final IngredientFetcher ingredientFetcher;
     private final DrinkFetcher drinkFetcher;
-    private final IngredientService ingredientService;
-    private final PostService postService;
-    private final LikeService likeService;
-    private final CommentService commentService;
+    private final IIngredientService ingredientService;
+    private final IPostService postService;
+    private final ILikeService likeService;
+    private final ICommentService commentService;
     private final AdminUserFactory adminUserFactory;
-    private final TagService tagService;
+    private final ITagService tagService;
 
     private static final Logger LOGGER = Logger.getLogger(DBuilder.class.getName());
 

@@ -2,22 +2,26 @@ package pl.jakubkonkol.tasteitserver.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.jakubkonkol.tasteitserver.annotation.RegisterAction;
 import pl.jakubkonkol.tasteitserver.dto.UserReturnDto;
 import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
 import pl.jakubkonkol.tasteitserver.model.Like;
 import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.repository.LikeRepository;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
+import pl.jakubkonkol.tasteitserver.service.interfaces.ILikeService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class LikeService {
+public class LikeService implements ILikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
-    private final UserService userService;
+    private final IUserService userService;
 
+    @RegisterAction(actionType = "LIKE_POST")
     public void likePost(String postId, String token) {
         UserReturnDto userByToken = userService.getCurrentUserDtoBySessionToken(token);
         Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found"));

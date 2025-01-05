@@ -16,7 +16,7 @@ button {
 }
 
 .button-primary:disabled {
-  background-color: var(--theme-color-300);
+  opacity: 50%;
   color: var(--theme-color-950);
   cursor: not-allowed;
 }

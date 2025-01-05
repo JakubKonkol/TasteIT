@@ -1,0 +1,18 @@
+<div class="navigation">
+  <button class="nav-button" (click)="close()">
+    <span class="material-icons">close</span>
+  </button>
+  <button class="nav-button"
+          (click)="prevStep()"
+          [disabled]="currentStep === 1">
+    <span class="material-icons">chevron_left</span>
+  </button>
+
+  <button class="nav-button"
+          (click)="currentStep==5 ? onSubmit() : nextStep()"
+          [disabled]="!canProceed">
+      <span class="material-icons">
+        {{currentStep==5 ? 'check' : 'chevron_right'}}
+      </span>
+  </button>
+</div>

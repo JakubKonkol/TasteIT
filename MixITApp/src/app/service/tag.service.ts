@@ -18,4 +18,22 @@ export class TagService{
       return Promise.reject(error.response?.data || error);
     }
   }
+  async getAll(): Promise<Tag[]> {
+      try{
+        const res = await taste_api.get('tags/');
+        return res.data as Tag[];
+      } catch (error: any) {
+        this.logger.logError(`Error fetching all tags`, error.response?.data || error);
+        return Promise.reject(error.response?.data || error);
+      }
+  }
+  async create(tag: Tag): Promise<Tag> {
+    try {
+      const res = await taste_api.post('tags/', tag);
+      return res.data as Tag;
+    } catch (error: any) {
+      this.logger.logError(`Error creating tag`, error.response?.data || error);
+      return Promise.reject(error.response?.data || error);
+    }
+  }
 }

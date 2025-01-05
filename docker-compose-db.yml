@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  tasteit-db:
+    image: mongo:latest
+    container_name: tasteit-db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:

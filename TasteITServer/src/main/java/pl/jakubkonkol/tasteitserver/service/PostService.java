@@ -2,6 +2,8 @@ package pl.jakubkonkol.tasteitserver.service;
 
 import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +14,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import pl.jakubkonkol.tasteitserver.dto.PageDto;
+import pl.jakubkonkol.tasteitserver.dto.PostAuthorDto;
 import pl.jakubkonkol.tasteitserver.dto.PostDto;
 import pl.jakubkonkol.tasteitserver.dto.UserReturnDto;
 import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
@@ -20,54 +23,73 @@ import pl.jakubkonkol.tasteitserver.model.Recipe;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.model.enums.PostType;
 import pl.jakubkonkol.tasteitserver.model.projection.PostPhotoView;
+import pl.jakubkonkol.tasteitserver.model.projection.UserShort;
 import pl.jakubkonkol.tasteitserver.repository.LikeRepository;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
-
+import pl.jakubkonkol.tasteitserver.service.interfaces.IPostService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PostService {
-    private final UserService userService;
+public class PostService implements IPostService {
+    private final IUserService userService;
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
     private final MongoTemplate mongoTemplate;
 
+    @CacheEvict(value = {"posts", "postById", "userPosts", "postsByTag", "likedPosts", "postsAll"}, allEntries = true)
     public void save(PostDto postDto) {
         Post post = convertToEntity(postDto);
         postRepository.save(Objects.requireNonNull(post, "Post cannot be null."));
     }
 
+    @CacheEvict(value = {"posts", "postById", "userPosts", "postsByTag", "likedPosts", "postsAll"}, allEntries = true)
     public List<Post> saveAll(List<Post> posts) {
         return postRepository.saveAll(
                 Objects.requireNonNull(posts, "List of posts cannot be null."));
     }
 
+    @CacheEvict(value = {"posts", "postById", "userPosts", "postsByTag", "likedPosts", "postsAll"}, allEntries = true)
     public void deleteAll() {
         postRepository.deleteAll();
-    } //TODO niebezpieczne
+    }
 
+    @Cacheable(value = "postsAll", key = "'AllPosts'")
     public List<Post> getAll() {
         return postRepository.findAll();
     }
 
+    @Cacheable(value = "postById", key = "#postId")
     public PostDto getPost(String postId, String sessionToken) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(
-                        () -> new NoSuchElementException("Post with id " + postId + " not found"));
-        return convertToDto(post, sessionToken);
+                .orElseThrow(() -> new NoSuchElementException("Post with id " + postId + " not found"));
+
+        PostDto postDto = convertToDto(post, sessionToken);
+        PostAuthorDto postAuthorDto = new PostAuthorDto();
+
+        UserShort userShort = userService.findUserShortByUserId(post.getUserId());
+        postAuthorDto.setUserId(userShort.getUserId());
+        postAuthorDto.setDisplayName(userShort.getDisplayName());
+        postAuthorDto.setProfilePicture(userShort.getProfilePicture());
+        postDto.setPostAuthorDto(postAuthorDto);
+
+        return postDto;
     }
 
     //temp implementation
+
     public PageDto<PostDto> getRandomPosts(Integer page, Integer size, String sessionToken) {
         Pageable pageable = PageRequest.of(page, size);
-
-        long total = postRepository.count();
 
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.sample(size)
@@ -80,7 +102,33 @@ public class PostService {
             throw new NoSuchElementException("No random posts found in repository");
         }
 
-        return getPostDtoPageDto(posts, total, pageable, sessionToken);
+        List<String> userIds = posts.stream()
+                .map(Post::getUserId)
+                .distinct()
+                .toList();
+
+        List<UserShort> userShorts = userService.getUserShortByIdIn(userIds);
+
+        Map<String, UserShort> userShortMap = userShorts.stream()
+                .collect(Collectors.toMap(UserShort::getUserId, userShort -> userShort));
+
+        List<PostDto> postDtos = posts.stream()
+                .map(post -> {
+                    PostDto postDto = convertToDto(post, sessionToken);
+                    UserShort userShort = userShortMap.get(post.getUserId());
+                    if (userShort != null) {
+                        PostAuthorDto postAuthorDto = new PostAuthorDto();
+                        postAuthorDto.setUserId(userShort.getUserId());
+                        postAuthorDto.setDisplayName(userShort.getDisplayName());
+                        postAuthorDto.setProfilePicture(userShort.getProfilePicture());
+                        postDto.setPostAuthorDto(postAuthorDto);
+                    }
+                    return postDto;
+                })
+                .toList();
+
+        PageImpl<PostDto> pageImpl = new PageImpl<>(postDtos, pageable, postDtos.size());
+        return getPageDto(pageImpl);
     }
 
     //if title consists few words use '%20' between them in get request
@@ -159,6 +207,7 @@ public class PostService {
         return filteredPostsDtos;
     }
 
+    @Cacheable(value = "postsByTag", key = "#tagId + '_' + #page + '_' + #size")
     public PageDto<PostDto> searchPostsByTagName(String tagId, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<PostPhotoView> postPage = postRepository.findPostsByTagsTagId(tagId, pageable);
@@ -166,6 +215,7 @@ public class PostService {
         return getPostDtoPageDtoFromPostPhotoView(postPage, pageable);
     }
 
+    @Cacheable(value = "userPosts", key = "#userId + '_' + #page + '_' + #size")
     public PageDto<PostDto> getUserPosts(String userId, Integer page, Integer size) {
         userService.checkIfUserExists(userId);
         Pageable pageable = PageRequest.of(page, size);
@@ -174,8 +224,8 @@ public class PostService {
         return getPostDtoPageDtoFromPostPhotoView(postsPhotoViewPage, pageable);
     }
 
-    private PageDto<PostDto> getPostDtoPageDto(List<Post> posts, Long total, Pageable pageable,
-                                               String sessionToken) {
+
+    public PageDto<PostDto> getPostDtoPageDto(List<Post> posts, Long total, Pageable pageable, String sessionToken) {
         List<PostDto> postDtos = posts.stream()
                 .map(post -> convertToDto(post, sessionToken))
                 .toList();
@@ -200,7 +250,7 @@ public class PostService {
         return getPageDto(pageImpl);
     }
 
-    private PageDto<PostDto> getPageDto(PageImpl<PostDto> pageImpl) {
+    public PageDto<PostDto> getPageDto(PageImpl<PostDto> pageImpl) {
         PageDto<PostDto> pageDto = new PageDto<>();
         pageDto.setContent(pageImpl.getContent());
         pageDto.setPageNumber(pageImpl.getNumber());
@@ -217,6 +267,7 @@ public class PostService {
         return post.getRecipe();
     }
 
+    @Cacheable(value = "likedPosts", key = "#userId + '_' + #sessionToken")
     public List<PostDto> getPostsLikedByUser(String userId, String sessionToken) {
         var likes = likeRepository.findByUserId(userId);
         var posts = postRepository.findByLikesIn(likes);
@@ -226,13 +277,14 @@ public class PostService {
                 .toList();
     }
 
+    @CacheEvict(value = {"posts", "postById", "userPosts", "postsByTag", "likedPosts", "postsAll"}, allEntries = true)
     public PostDto createPost(PostDto postDto, String sessionToken) {
         Post post = convertToEntity(postDto);
         postRepository.save(post);
         return convertToDto(post, sessionToken);
     }
 
-    private PostDto convertToDto(Post post, String sessionToken) {
+    public PostDto convertToDto(Post post, String sessionToken) {
         PostDto postDto = modelMapper.map(post, PostDto.class);
         postDto.setLikesCount((long) post.getLikes().size());
         postDto.setCommentsCount((long) post.getComments().size());
@@ -283,6 +335,40 @@ public class PostService {
 
         public int getMatchCount() {
             return matchCount;
+        }
+    }
+
+    public PageDto<PostDto> convertPostsToPageDto(String sessionToken, List<Post> posts, Pageable pageable) {
+        List<String> userIds = posts.stream()
+                .map(Post::getUserId)
+                .distinct()
+                .toList();
+
+        List<UserShort> userShorts = userService.getUserShortByIdIn(userIds);
+
+        Map<String, UserShort> userShortMap = userShorts.stream()
+                .collect(Collectors.toMap(UserShort::getUserId, userShort -> userShort));
+
+        List<PostDto> postDtos = posts.stream()
+                .map(post -> {
+                    PostDto postDto = convertToDto(post, sessionToken);
+                    addAuthorInfo(post, userShortMap, postDto);
+                    return postDto;
+                })
+                .toList();
+
+        PageImpl<PostDto> pageImpl = new PageImpl<>(postDtos, pageable, postDtos.size());
+        return getPageDto(pageImpl);
+    }
+
+    private void addAuthorInfo(Post post, Map<String, UserShort> userShortMap, PostDto postDto) {
+        UserShort userShort = userShortMap.get(post.getUserId());
+        if (userShort != null) {
+            PostAuthorDto postAuthorDto = new PostAuthorDto();
+            postAuthorDto.setUserId(userShort.getUserId());
+            postAuthorDto.setDisplayName(userShort.getDisplayName());
+            postAuthorDto.setProfilePicture(userShort.getProfilePicture());
+            postDto.setPostAuthorDto(postAuthorDto);
         }
     }
 }

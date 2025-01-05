@@ -19,8 +19,8 @@
         <div class="ingredients-list">
           <div *ngFor="let ingredient of recipe.ingredientsWithMeasurements"
                class="ingredient-item">
-            <span class="amount">{{ingredient.measurement?.value}}</span>
             <span class="name">{{ingredient.name}}</span>
+            <span class="amount">{{ingredient.measurement?.value}}</span>
           </div>
         </div>
       </div>

@@ -99,5 +99,9 @@
   color: #aaa;
 }
 .red{
-  color: red !important;
+  color: #ff4081 !important;
+}
+.post-picture{
+  width: 400px;
+  height: 400px;
 }

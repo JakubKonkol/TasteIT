@@ -1,21 +1,13 @@
 package pl.jakubkonkol.tasteitserver.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.jakubkonkol.tasteitserver.dto.CommentDto;
 import pl.jakubkonkol.tasteitserver.dto.FoodListDto;
-import pl.jakubkonkol.tasteitserver.dto.PageDto;
 import pl.jakubkonkol.tasteitserver.dto.PostDto;
 import pl.jakubkonkol.tasteitserver.model.GenericResponse;
-import pl.jakubkonkol.tasteitserver.model.Post;
-import pl.jakubkonkol.tasteitserver.model.Recipe;
-import pl.jakubkonkol.tasteitserver.service.CommentService;
-import pl.jakubkonkol.tasteitserver.service.FoodListService;
-import pl.jakubkonkol.tasteitserver.service.LikeService;
-import pl.jakubkonkol.tasteitserver.service.PostService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IFoodListService;
 
 import java.util.List;
 
@@ -23,7 +15,7 @@ import java.util.List;
 @RequestMapping("/api/v1/foodlist")
 @RequiredArgsConstructor
 public class FoodListController {
-    private final FoodListService foodListService;
+    private final IFoodListService foodListService;
 
     @PostMapping("/{name}")
     public ResponseEntity<FoodListDto> createFoodList(

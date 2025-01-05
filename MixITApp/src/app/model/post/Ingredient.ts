@@ -1,7 +1,7 @@
 import {Measurement} from "./Measurement";
 
 export interface Ingredient{
-  ingredientId: number;
+  ingredientId?: number;
   name: string;
   description?: string;
   type?: string;

@@ -12,13 +12,15 @@ import pl.jakubkonkol.tasteitserver.exception.IncorrectPasswordException;
 import pl.jakubkonkol.tasteitserver.model.Authentication;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IAuthenticationService;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class AuthenticationService implements IAuthenticationService {
 
     private final UserRepository userRepository;
     private final CryptoTools cryptoTools;
+
     public User register(final UserCreationRequestDto userCreationRequestDto) {
         var existingUser = userRepository.findByEmail(userCreationRequestDto.getEmail());
         if (existingUser.isPresent()) {

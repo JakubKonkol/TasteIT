@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.jakubkonkol.tasteitserver.dto.*;
 import pl.jakubkonkol.tasteitserver.model.GenericResponse;
-import pl.jakubkonkol.tasteitserver.service.PostService;
-import pl.jakubkonkol.tasteitserver.service.UserService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IPostService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 
 import java.util.List;
 
@@ -17,8 +17,8 @@ import java.util.List;
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
-    private final PostService postService;
+    private final IUserService userService;
+    private final IPostService postService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserReturnDto> getUserById(@PathVariable String userId, @RequestHeader("Authorization") String sessionToken) {
@@ -39,8 +39,8 @@ public class UserController {
     }
 
     @PutMapping()
-    public ResponseEntity<GenericResponse> updateUserProfile(@Valid @RequestBody UserProfileDto userProfileDto) {
-        userService.updateUserProfile(userProfileDto);
+    public ResponseEntity<GenericResponse> updateUserProfile(@Valid @RequestBody UserProfileDto userProfileDto, @RequestHeader("Authorization") String sessionToken) {
+        userService.updateUserProfile(userProfileDto, sessionToken);
         return ResponseEntity.ok(GenericResponse
                 .builder()
                 .status(HttpStatus.OK.value()).
@@ -49,8 +49,8 @@ public class UserController {
     }
 
     @PatchMapping("/first-login/{userId}")
-    public ResponseEntity<GenericResponse> changeUserFirstLogin(@PathVariable String userId) {
-        userService.changeUserFirstLogin(userId);
+    public ResponseEntity<GenericResponse> changeUserFirstLogin(@PathVariable String userId, @RequestHeader("Authorization") String sessionToken) {
+        userService.changeUserFirstLogin(userId, sessionToken);
         return ResponseEntity.ok(GenericResponse
                 .builder()
                 .status(HttpStatus.OK.value()).
@@ -59,8 +59,8 @@ public class UserController {
     }
 
     @PatchMapping("/tags/{userId}")
-    public ResponseEntity<GenericResponse> updateUserTags(@PathVariable String userId, @RequestBody UserTagsDto userTagsDto) {
-        userService.updateUserTags(userId, userTagsDto);
+    public ResponseEntity<GenericResponse> updateUserTags(@PathVariable String userId, @RequestBody UserTagsDto userTagsDto, @RequestHeader("Authorization") String sessionToken) {
+        userService.updateUserTags(userId, userTagsDto, sessionToken);
         return ResponseEntity.ok(GenericResponse
                 .builder()
                 .status(HttpStatus.OK.value()).
@@ -99,7 +99,6 @@ public class UserController {
             @RequestHeader("Authorization") String sessionToken,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size) {
-
         PageDto<UserReturnDto> followers = userService.getFollowers(userId, sessionToken, page, size);
         return ResponseEntity.ok(followers);
     }
@@ -110,7 +109,6 @@ public class UserController {
             @RequestHeader("Authorization") String sessionToken,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "20") Integer size) {
-
         PageDto<UserReturnDto> following = userService.getFollowing(userId, sessionToken, page, size);
         return ResponseEntity.ok(following);
     }
@@ -121,5 +119,25 @@ public class UserController {
                                                          @RequestParam(defaultValue = "20") int size) {
         PageDto<PostDto> posts = postService.getUserPosts(userId, page, size);
         return ResponseEntity.ok(posts);
+    }
+
+    @PatchMapping("/banned_ingredients")
+    public ResponseEntity<GenericResponse> updateUserBannedIngredients(@RequestHeader("Authorization") String sessionToken, @RequestBody List<IngredientDto> ingredients) {
+        userService.updateUserBannedIngredients(sessionToken, ingredients);
+        return ResponseEntity.ok(GenericResponse
+                .builder()
+                .status(HttpStatus.OK.value())
+                .message("Banned Ingredients updated")
+                .build());
+    }
+
+    @PatchMapping("/banned_tags")
+    public ResponseEntity<GenericResponse> updateUserBannedTags(@RequestHeader("Authorization") String sessionToken, @RequestBody List<TagDto> tags) {
+        userService.updateUserBannedTags(sessionToken, tags);
+        return ResponseEntity.ok(GenericResponse
+                .builder()
+                .status(HttpStatus.OK.value())
+                .message("Banned Tags updated")
+                .build());
     }
 }

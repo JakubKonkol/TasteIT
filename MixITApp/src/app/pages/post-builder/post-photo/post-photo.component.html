@@ -1,0 +1,45 @@
+<div class="container">
+  <div class="content">
+    <div class="title">
+      <h1>Upload a Photo</h1>
+      <p>Choose a photo that best represents your recipe</p>
+    </div>
+
+    <div class="upload-area" [class.has-image]="imageChangedEvent">
+      <image-cropper
+        *ngIf="imageChangedEvent"
+        [imageChangedEvent]="imageChangedEvent"
+        format="png"
+        output="base64"
+        (imageCropped)="onImageCropped($event)"
+        [cropperMinWidth]="500"
+        [cropperMinHeight]="500"
+      ></image-cropper>
+
+      <div class="upload-placeholder" *ngIf="!imageChangedEvent" (click)="fileInput.click()">
+        <mat-icon>photo_camera</mat-icon>
+        <p>Tap to add photo</p>
+      </div>
+    </div>
+
+    <button class="button-tertiary" *ngIf="imageChangedEvent" (click)="fileInput.click()">
+      Choose other photo
+    </button>
+
+    <input
+      type="file"
+      accept="image/*"
+      #fileInput
+      (change)="onFileSelected($event)"
+      style="display: none"
+    >
+  </div>
+
+  <app-pbnavigation
+    [currentStep]="1"
+    [canProceed]="readyToContinue"
+    [isLastStep]="false"
+    (closeEmitter)="onClose()"
+    (nextStepEmitter)="uploadPhoto()"
+  />
+</div>

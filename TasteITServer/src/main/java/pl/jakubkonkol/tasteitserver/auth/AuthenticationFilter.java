@@ -49,6 +49,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         User user = optionalUser.get();
         req.setAttribute("identity", user);
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        authentication.setDetails(user.getUserId());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(req, res);
     }

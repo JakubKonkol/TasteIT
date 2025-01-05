@@ -1,0 +1,113 @@
+<div class="container">
+  <header class="header">
+    <h1 class="header-title">Fill in Recipe Ingredients</h1>
+  </header>
+  <div class="wrapper">
+    <div class="input-field">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search for ingredients"
+        (input)="onSearch($event)"
+      >
+    </div>
+    <div class="suggestions" *ngIf="suggestions.length > 0">
+      <div
+        class="suggestion-item"
+        *ngFor="let ingredient of suggestions"
+        (click)="selectIngredient(ingredient)"
+      >
+        <span class="ingredient-name">{{ingredient.name}}</span>
+        <span class="ingredient-type" *ngIf="ingredient.type">{{ingredient.type}}</span>
+      </div>
+    </div>
+    <button class="button-primary margin-top-1rem" (click)="showNewIngredientForm = true">Create New Ingredient</button>
+
+    <div class="recipe-selected-ingredients">
+      <div
+        class="recipe-ingredient-token"
+        *ngFor="let ingredient of selectedIngredients; let i = index"
+      >
+        <div class="recipe-ingredient-details">
+          <span class="recipe-ingredient-label">{{ingredient.name}}</span>
+          <span class="recipe-ingredient-quantity">
+        {{ingredient.measurement?.value}} {{ingredient.measurement?.unit}}
+      </span>
+        </div>
+        <button class="recipe-ingredient-remove-btn" (click)="deleteSelectedIngredient(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- New Ingredient Form Modal -->
+  <div class="transparent-modal" *ngIf="showNewIngredientForm">
+    <div class="modal-content">
+      <h3>Create New Ingredient</h3>
+      <form [formGroup]="newIngredientForm" (ngSubmit)="saveNewIngredient()">
+        <div class="input-field">
+          <mat-icon>book_4</mat-icon>
+          <input formControlName="name" placeholder="Name">
+        </div>
+        <div class="input-field">
+          <mat-icon>description</mat-icon>
+          <input formControlName="description" placeholder="Description">
+        </div>
+        <div class="checkbox-field">
+          <label>
+            <input type="checkbox" formControlName="isAlcohol" (change)="toggleStrengthField()">
+            Contains alcohol
+          </label>
+        </div>
+        <div class="input-field" *ngIf="showStrengthField">
+          <mat-icon>liquor</mat-icon>
+          <input formControlName="strength" placeholder="Strength">
+        </div>
+
+
+        <div class="error-message" *ngIf="errorMessage">
+          {{errorMessage}}
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="button-primary" [disabled]="!newIngredientForm.valid">Save Ingredient</button>
+          <button type="button" class="button-tertiary" (click)="showNewIngredientForm = false">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Measurement Modal -->
+  <div class="transparent-modal" *ngIf="showMeasurementModal">
+    <div class="modal-content">
+      <h3>Add Measurement</h3>
+      <form [formGroup]="measurementForm" (ngSubmit)="addMeasurement()">
+        <div class="input-field">
+          <input formControlName="value" placeholder="Amount" type="number">
+        </div>
+        <select class="select-field" formControlName="unit">
+          <option value="">Select unit</option>
+          <option *ngFor="let unit of units" [value]="unit">{{unit}}</option>
+        </select>
+        <div class="modal-actions">
+          <button type="submit" class='button-primary' [disabled]="!measurementForm.valid">Add To Your Recipe</button>
+          <button type="button" class="button-tertiary" (click)="showMeasurementModal = false">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <app-pbnavigation
+    [currentStep]="3"
+    [canProceed]="canProceed"
+    [isLastStep]="false"
+    (closeEmitter)="onClose()"
+    (prevStepEmitter)="onPrevStep()"
+    (nextStepEmitter)="onNextStep()"
+    />
+
+</div>

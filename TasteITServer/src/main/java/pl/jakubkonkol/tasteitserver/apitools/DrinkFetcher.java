@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import pl.jakubkonkol.tasteitserver.factory.PostDrinkFactory;
 import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.User;
-import pl.jakubkonkol.tasteitserver.service.PostService;
-import pl.jakubkonkol.tasteitserver.service.UserService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IPostService;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,11 +27,11 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class DrinkFetcher {
     private final OkHttpClient client;
-    private final PostService postService;
+    private final IPostService postService;
     private static final Logger LOGGER = Logger.getLogger(DrinkFetcher.class.getName());
     private final String drinkFinderURL = "https://thecocktaildb.com/api/json/v1/1/search.php?f=";
     private final PostDrinkFactory postFactory;
-    private final UserService userService;
+    private final IUserService userService;
 
     public void populateDBWithDrinks() throws IOException {
         var drinks = fetchDrinks();

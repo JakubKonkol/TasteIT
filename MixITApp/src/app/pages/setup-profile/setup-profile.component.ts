@@ -10,6 +10,7 @@ import {UserTags} from '../../model/user/UserTags';
 import {StorageUploadService} from '../../service/storage-upload.service';
 import {ImageCroppedEvent} from 'ngx-image-cropper';
 import {TagService} from "../../service/tag.service";
+import {PhotoHelper} from "../../helpers/PhotoHelper";
 
 interface Step {
   label: string;
@@ -192,24 +193,11 @@ export class SetupProfileComponent implements OnInit {
   uploadProfilePicture(): void {
     if (!this.croppedImage) return;
 
-    const file = this.base64ToFile(this.croppedImage, `${this.user.userId}.png`);
+    const file = PhotoHelper.base64ToFile(this.croppedImage, `${this.user.userId}.png`);
     const filePath = `profile_pictures/${this.user.userId}.png`;
 
     this.storageUploadService.uploadFile(file, filePath).subscribe(url => {
       this.profilePicUrl = url;
     });
-  }
-
-  base64ToFile(data: any, filename: string): File {
-    const arr = data.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    const n = bstr.length;
-    const u8arr = new Uint8Array(n);
-
-    for (let i = 0; i < n; i++) {
-      u8arr[i] = bstr.charCodeAt(i);
-    }
-    return new File([u8arr], filename, { type: mime });
   }
 }

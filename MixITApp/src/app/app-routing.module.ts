@@ -37,8 +37,8 @@ const routes: Routes = [
   {path: 'foodlists', component: FoodlistsComponent, data: {showNav: true}, canActivate: [AuthGuard]},
   {path: 'foodlist/:id', component:FoodlistViewComponent, data: {showNav: true}, canActivate: [AuthGuard]},
   {path: 'user-profile/:id', component: UserProfileComponent, data: {showNav: true}, canActivate: [AuthGuard]},
-  {path: 'userLikes', component: UserLikesComponent, data: {showNav: true}, canActivate: [AuthGuard]},
-  {path: 'postBuilder', component: PostBuilderComponent, data: {showNav: true}, canActivate: [AuthGuard]},
+  {path: 'userLikes', component: UserLikesComponent, data: {showNav: false}, canActivate: [AuthGuard]},
+  {path: 'postBuilder', component: PostBuilderComponent, data: {showNav: false}, canActivate: [AuthGuard]},
   {path: 'user-profile/:id/following', component: FollowingFollowersListComponent, data: {showNav: true}, canActivate: [AuthGuard]},
   {path: 'user-profile/:id/followers', component: FollowingFollowersListComponent, data: {showNav: true}, canActivate: [AuthGuard]},
   {path: 'tag/:id', component: TagViewComponent, data: {showNav: true}, canActivate: [AuthGuard]}

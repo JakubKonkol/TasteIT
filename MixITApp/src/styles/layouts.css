@@ -70,9 +70,17 @@ html, body {
   height: 2rem;
   font-size: 18px;
 }
-.input-field > input:focus {
-  outline: none;
-}
 .input-field > mat-icon{
   font-size: 24px;
+}
+.input-field > input:focus{
+  outline: none;
+}
+.input-field:focus {
+  outline: none;
+  border-color: var(--theme-color-500);
+  box-shadow: 0 0 0 2px var(--theme-color-200);
+}
+.input-field.error {
+  border-color: #ff4444;
 }

@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   tasteit-db:
     image: mongo:latest
@@ -12,6 +11,27 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
     volumes:
       - mongo-data:/data/db
+    networks:
+      - app-network
+
+  zookeeper:
+    extends:
+      file: ./infrastructure/kafka/docker-compose.yml
+      service: zookeeper
+    networks:
+      - app-network
+
+  kafka:
+    extends:
+      file: ./infrastructure/kafka/docker-compose.yml
+      service: kafka
+    networks:
+      - app-network
+
+  kafka-ui:
+    extends:
+      file: ./infrastructure/kafka/docker-compose.yml
+      service: kafka-ui
     networks:
       - app-network
 

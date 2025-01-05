@@ -14,7 +14,7 @@
       <p class="name-text"> {{activePost.postMedia?.title}}</p>
       <p class="desc-text">{{activePost.likesCount}} likes {{activePost.commentsCount}} comments</p>
       <p class="desc-text">{{activePost.postMedia?.description}}</p>
-      <p class="category-text"> <b *ngFor="let tag of activePost.tags">{{tag.tagName}}  </b></p>
+      <p class="category-text"> <b *ngFor="let tag of activePost.tags">{{tag?.tagName || ''}}  </b></p>
     </div>
 
     <div class="user-info" (click)="gotoProfile(postAuthor.userId || '')">
@@ -27,7 +27,7 @@
           *ngFor="let ingr of getIngredients()"
           highlighted
           style="background-color: var(--theme-color-600); color:var(--theme-color-50); font-size: 16px; font-weight: 700; text-transform: capitalize;"
-          (click)="initializeIngredientView(ingr.ingredientId)">
+          (click)="initializeIngredientView(ingr.ingredientId || 0)">
           {{ingr.name}}
         </mat-chip>
       </mat-chip-set>
@@ -38,8 +38,15 @@
 <!--  BUTTONS-->
   <div class="buttons">
     <div class="left-action">
-      <button  *ngIf="isPostLikedByCurrentUser" (click)="toggleLike()" class="button-actions-small active" matRipple><mat-icon>favorite</mat-icon></button>
-      <button  *ngIf="!isPostLikedByCurrentUser" (click)="toggleLike()" class="button-actions-small" matRipple><mat-icon>favorite</mat-icon></button>
+      <button
+        (click)="toggleLike()"
+        class="button-actions-small"
+        [class.liked]="isPostLikedByCurrentUser"
+        matRipple>
+        <mat-icon [class.animate-like]="isPostLikedByCurrentUser">
+          {{isPostLikedByCurrentUser ? 'favorite' : 'favorite'}}
+        </mat-icon>
+      </button>
       <button class="button-actions-small" matRipple (click)="initializeCommentSection(activePost.postId || '')"><mat-icon>chat</mat-icon></button>
       <button class="button-actions-small" matRipple (click)="initializeAddToFoodList()"><mat-icon>bookmark</mat-icon></button>
     </div>

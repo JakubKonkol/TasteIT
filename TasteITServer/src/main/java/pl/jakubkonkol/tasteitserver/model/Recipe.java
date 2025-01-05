@@ -16,8 +16,6 @@ public class Recipe {
     @NotEmpty(message = "Steps cannot be empty")
     private Map<Integer,  @NotNull(message = "Step Value cannot be null") @NotBlank(message = "Step Value cannot be blank.") String> steps = new HashMap<>();
     private Map<Integer, String> pictures = new HashMap<>();
-//    @NotEmpty(message = "At least one ingredient is required.")
-//    private List<IngredientWrapper> ingredientsMeasurements = new ArrayList<>();
     @NotEmpty(message = "At least one ingredient is required.")
-    private List<IngredientDto> ingredientsWithMeasurements = new ArrayList<>();
+    private List<IngredientWrapper> ingredientsWithMeasurements = new ArrayList<>();
 }

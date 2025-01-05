@@ -1,4 +1,4 @@
 export enum EPostType{
-  DRINK,
-  FOOD
+  DRINK = 'DRINK',
+  FOOD = 'FOOD'
 }
