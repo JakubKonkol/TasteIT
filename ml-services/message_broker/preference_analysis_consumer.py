@@ -5,7 +5,7 @@ from datetime import datetime
 from kafka import KafkaConsumer, KafkaProducer
 from user_preferences_analysis.preference_analysis_service import PreferenceAnalysisService
 
-KAFKA_BROKER_URL = os.getenv("KAFKA_BROKER_URL", "localhost:9092")
+KAFKA_BROKER_URL = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 REQUEST_TOPIC = "preference-analysis-request"
 RESPONSE_TOPIC = "preference-analysis-response"
 
