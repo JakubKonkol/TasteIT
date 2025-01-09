@@ -1,6 +1,5 @@
 package pl.jakubkonkol.tasteitserver.service;
 
-import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,18 +13,14 @@ import org.springframework.data.mongodb.core.query.Query;
 import pl.jakubkonkol.tasteitserver.badgeHandler.TrackBadgesProgress;
 import pl.jakubkonkol.tasteitserver.dto.PageDto;
 import pl.jakubkonkol.tasteitserver.dto.PostDto;
-import pl.jakubkonkol.tasteitserver.dto.UserReturnDto;
-import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
 import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.Recipe;
-import pl.jakubkonkol.tasteitserver.model.User;
-import pl.jakubkonkol.tasteitserver.model.enums.PostType;
+import pl.jakubkonkol.tasteitserver.model.enums.BadgeType;
 import pl.jakubkonkol.tasteitserver.model.projection.PostPhotoView;
 import pl.jakubkonkol.tasteitserver.repository.LikeRepository;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -166,8 +161,8 @@ public class PostService {
                 .toList();
     }
 
-    @TrackBadgesProgress(badgeId = "badge_001")
-    @TrackBadgesProgress(badgeId = "badge_004")
+
+    @TrackBadgesProgress(badges = {BadgeType.FIRST_RECIPE,BadgeType.MASTER_CHEF}) // kolekcja stringow
     public PostDto createPost(PostDto postDto, String sessionToken) {
         Post post = convertToEntity(postDto);
         postRepository.save(post);

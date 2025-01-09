@@ -29,7 +29,7 @@ public class BadgeService {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
-    public void saveBadgeData(){
+    public void saveBadgeData() {
         List<BadgeBlueprint> badgeBlueprintDataList = BadgeData.badgeBlueprintData;
         Pattern pattern = Pattern.compile("\\d+"); // Liczby w opisie
         Matcher matcher;
@@ -58,12 +58,9 @@ public class BadgeService {
     }
 
 
-
     public void grantBadgeToUser(String badgeId, String userId, String sessionToken) {
         User user = userService.getCurrentUserBySessionToken(sessionToken);
-        List<BadgeBlueprint> badgeBlueprints = badgeRepository.findAll();
-        BadgeBlueprint badgeBlueprint = badgeBlueprints.stream().filter(b -> b.getBadgeId().equals(badgeId))
-                .findFirst()
+        BadgeBlueprint badgeBlueprint = badgeRepository.findById(badgeId)
                 .orElseThrow();
 
         Badge badge = Badge.builder()
@@ -75,14 +72,9 @@ public class BadgeService {
                 .currentValue(1) // TODO w przyszłości currentValue powinno byc przypisywane autmoatycznie jakaś @Adnotacja albo metoda
                 .build();
 
-        if (!user.getBadges().contains(badge)) {
-            List<Badge> updatedBadges = new ArrayList<>(user.getBadges());
-            updatedBadges.add(badge);
-
-            userService.updateUserBadges(userId, updatedBadges);
-        } else {
-            LOGGER.log(Level.INFO, "Badge already granted or badge not found.");
-        }
+        List<Badge> updatedBadges = new ArrayList<>(user.getBadges());
+        updatedBadges.add(badge);
+        userService.updateUserBadges(userId, updatedBadges);
     }
 
     public void updateBadgeProgress(String sessionToken, String badgeId) {
@@ -93,8 +85,7 @@ public class BadgeService {
                 .findFirst()
                 .orElseThrow();
         if (updatedBadge.getCurrentValue() != updatedBadge.getGoalValue()) {
-            updatedBadge.setCurrentValue(updatedBadge.getCurrentValue()+1);
-            userBadges = List.of(updatedBadge);
+            updatedBadge.setCurrentValue(updatedBadge.getCurrentValue() + 1);
             userService.updateUserBadges(userReturnDto.getUserId(), userBadges);
         }
     }
