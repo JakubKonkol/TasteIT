@@ -74,6 +74,9 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Docker
+.env
+
 MixITApp/src/environments/environment.development.ts
 MixITApp/src/environments/environment.ts
 

@@ -6,11 +6,41 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
     volumes:
       - mongo-data:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  tasteit-api:
+    build:
+      context: ./TasteITServer
+      dockerfile: Dockerfile
+    container_name: tasteit-api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATA_MONGODB_HOST: tasteit-db
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: ${MONGO_DB}
+      SPRING_DATA_MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
+      SPRING_DATA_MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATA_MONGODB_AUTO_INDEX_CREATION: "true"
+    depends_on:
+      tasteit-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     networks:
       - app-network
 
