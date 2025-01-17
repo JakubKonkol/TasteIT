@@ -1,6 +1,5 @@
 package pl.jakubkonkol.tasteitserver.service;
 
-import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,13 +16,11 @@ import org.springframework.data.mongodb.core.query.Update;
 import pl.jakubkonkol.tasteitserver.dto.PageDto;
 import pl.jakubkonkol.tasteitserver.dto.PostAuthorDto;
 import pl.jakubkonkol.tasteitserver.dto.PostDto;
-import pl.jakubkonkol.tasteitserver.dto.UserReturnDto;
 import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
 import pl.jakubkonkol.tasteitserver.model.FoodList;
 import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.Recipe;
 import pl.jakubkonkol.tasteitserver.model.User;
-import pl.jakubkonkol.tasteitserver.model.enums.PostType;
 import pl.jakubkonkol.tasteitserver.model.projection.PostPhotoView;
 import pl.jakubkonkol.tasteitserver.model.projection.UserShort;
 import pl.jakubkonkol.tasteitserver.repository.CommentRepository;
@@ -33,8 +30,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IPostService;
-import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.jakubkonkol.tasteitserver.exception.UnauthorizedException;
@@ -132,8 +127,6 @@ public class PostService implements IPostService {
         return postDto;
     }
 
-    //temp implementation
-
     public PageDto<PostDto> getRandomPosts(Integer page, Integer size, String sessionToken) {
         Pageable pageable = PageRequest.of(page, size);
 
@@ -173,7 +166,6 @@ public class PostService implements IPostService {
         return getPageDto(pageImpl);
     }
 
-    //if title consists few words use '%20' between them in get request
     public PageDto<PostDto> searchPosts(String title, String postType, String sessionToken,
                                         int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -432,7 +424,11 @@ public class PostService implements IPostService {
                 })
                 .toList();
 
-        PageImpl<PostDto> pageImpl = new PageImpl<>(postDtos, pageable, postDtos.size());
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), postDtos.size());
+        List<PostDto> paginatedPosts = postDtos.subList(start, end);
+
+        PageImpl<PostDto> pageImpl = new PageImpl<>(paginatedPosts, pageable, postDtos.size());
         return getPageDto(pageImpl);
     }
 

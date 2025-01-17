@@ -169,6 +169,7 @@ public class UserService implements IUserService {
         return getUserPage(following, currentUser, page, size);
     }
 
+    // is this needed?
     private PageDto<UserReturnDto> getUserPage(List<String> userIds, User currentUser, Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserShort> userPage = userRepository.findUsersByUserIdIn(userIds, pageable);
