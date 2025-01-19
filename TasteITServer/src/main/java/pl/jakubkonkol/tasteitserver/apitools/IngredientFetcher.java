@@ -27,10 +27,10 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class IngredientFetcher {
     private static final Logger LOGGER = Logger.getLogger(IngredientFetcher.class.getName());
-//    @Value("${ingredientFinder.url}")
-    private final String ingredientFinderURL="https://www.thecocktaildb.com/api/json/v1/1/search.php?i=";
-//    @Value("${ingredientList.url}")
-    private final String ingredientListURL="https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list";
+    @Value("${ingredientFinder.url}")
+    private String ingredientFinderURL;
+    @Value("${ingredientList.url}")
+    private String ingredientListURL;
     private final IIngredientService ingredientService;
     private final IngredientDrinkFactory ingredientFactory;
     private final OkHttpClient client;

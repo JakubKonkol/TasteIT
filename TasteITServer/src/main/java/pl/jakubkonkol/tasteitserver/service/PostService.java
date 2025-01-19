@@ -98,6 +98,9 @@ public class PostService implements IPostService {
     public PostDto getPost(String postId, String sessionToken) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post with id " + postId + " not found"));
+
+        if (post.getUserId() == null) throw new IllegalArgumentException("Post User ID cannot be null");
+
         return convertToDto(post, sessionToken);
     }
 
@@ -264,6 +267,10 @@ public class PostService implements IPostService {
         UserShort currentUser = userService.getCurrentUserShortBySessionToken(sessionToken);
 
         Post post = convertToEntity(postDto);
+
+        if (post.getUserId() == null) throw new NoSuchElementException("Post User ID cannot be null");
+        if (post.getRecipe() == null) throw new NoSuchElementException("Post Recipe ID cannot be null");
+
         post.setUserId(currentUser.getUserId());
 
         Post savedPost = postRepository.save(post);
@@ -275,7 +282,6 @@ public class PostService implements IPostService {
 
         PostAuthorDto authorDto = convertToPostAuthorDto(currentUser);
         responseDto.setPostAuthorDto(authorDto);
-
         return responseDto;
     }
 

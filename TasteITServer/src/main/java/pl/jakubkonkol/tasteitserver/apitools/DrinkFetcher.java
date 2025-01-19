@@ -30,8 +30,8 @@ public class DrinkFetcher {
     private final OkHttpClient client;
     private final IPostService postService;
     private static final Logger LOGGER = Logger.getLogger(DrinkFetcher.class.getName());
-//    @Value("${drinkfinder.url}")
-    private final String drinkFinderURL = "https://thecocktaildb.com/api/json/v1/1/search.php?f=";
+    @Value("${drinkfinder.url}")
+    private String drinkFinderURL;
     private final PostDrinkFactory postFactory;
     private final IUserService userService;
 

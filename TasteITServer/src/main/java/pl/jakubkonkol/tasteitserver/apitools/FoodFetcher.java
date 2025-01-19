@@ -37,10 +37,10 @@ public class FoodFetcher {
     private final OkHttpClient client;
     private final IngredientMealFactory ingredientFactory;
     private final PostMealFactory postFactory;
-//    @Value("${foodFinder.url}")
-    private final String foodFinderURL="https://themealdb.com/api/json/v1/1/search.php?f=";
-//    @Value("${ingredientFoodList.url}")
-    private final String ingredientListURL="https://www.themealdb.com/api/json/v1/1/list.php?i=list";
+    @Value("${foodFinder.url}")
+    private String foodFinderURL;
+    @Value("${ingredientFoodList.url}")
+    private String ingredientListURL;
     private final IUserService userService;
 
     /**

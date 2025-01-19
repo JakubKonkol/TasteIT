@@ -41,7 +41,7 @@ public class DBuilder {
     /**
      * Uncomment @PostConstruct if u want to populate database with data from API
      */
-    @PostConstruct
+//    @PostConstruct
     public void buildDataBase() {
          try {
              ingredientService.deleteAll();
