@@ -11,7 +11,7 @@ export class TagService{
 
   async getBasicTags(): Promise<Tag[]> {
     try {
-      const res = await taste_api.get('tags/basic');
+      const res = await taste_api.get('tag/basic');
       return res.data as Tag[];
     } catch (error: any) {
       this.logger.logError(`Error fetching basic tags`, error.response?.data || error);
@@ -20,7 +20,7 @@ export class TagService{
   }
   async getAll(): Promise<Tag[]> {
       try{
-        const res = await taste_api.get('tags/');
+        const res = await taste_api.get('tag/');
         return res.data as Tag[];
       } catch (error: any) {
         this.logger.logError(`Error fetching all tags`, error.response?.data || error);
@@ -29,7 +29,7 @@ export class TagService{
   }
   async create(tag: Tag): Promise<Tag> {
     try {
-      const res = await taste_api.post('tags/', tag);
+      const res = await taste_api.post('tag/', tag);
       return res.data as Tag;
     } catch (error: any) {
       this.logger.logError(`Error creating tag`, error.response?.data || error);
