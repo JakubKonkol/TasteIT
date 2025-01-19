@@ -5,7 +5,6 @@ import org.springframework.data.mongodb.repository.Query;
 import pl.jakubkonkol.tasteitserver.model.UserAction;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 public interface UserActionRepository extends MongoRepository<UserAction, String> {

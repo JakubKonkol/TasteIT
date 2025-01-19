@@ -12,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pl.jakubkonkol.tasteitserver.model.ErrorResponse;
-import pl.jakubkonkol.tasteitserver.model.GenericResponse;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 

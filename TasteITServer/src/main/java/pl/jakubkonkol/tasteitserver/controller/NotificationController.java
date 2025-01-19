@@ -11,7 +11,7 @@ import pl.jakubkonkol.tasteitserver.service.interfaces.INotificationService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/notifications")
+@RequestMapping("/api/v1/notification")
 @RequiredArgsConstructor
 public class NotificationController {
     private final INotificationService notificationService;

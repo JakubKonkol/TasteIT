@@ -7,9 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -35,14 +32,10 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import pl.jakubkonkol.tasteitserver.service.PostService;
-import pl.jakubkonkol.tasteitserver.service.CommentService;
-import pl.jakubkonkol.tasteitserver.service.LikeService;
-import pl.jakubkonkol.tasteitserver.service.UserService;
+import pl.jakubkonkol.tasteitserver.service.*;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.text.SimpleDateFormat;
 
 import org.bson.Document;
 
@@ -57,8 +50,6 @@ public class UserFlowE2ETest {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private PostService postService;
-    @Autowired
     private CommentService commentService;
     @Autowired
     private LikeService likeService;
@@ -66,6 +57,8 @@ public class UserFlowE2ETest {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PostValidationService postValidationService;
 
     private static String sessionToken;
     private static String userId;
@@ -147,7 +140,7 @@ public class UserFlowE2ETest {
         profileDto.setBirthDate(specificDate);
 
         // When
-        mockMvc.perform(put("/api/v1/user/updateUserProfile")
+        mockMvc.perform(put("/api/v1/user/update-user-profile")
                         .header("Authorization", sessionToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(profileDto)))
@@ -170,7 +163,7 @@ public class UserFlowE2ETest {
     void shouldGetRandomFeed() throws Exception {
         assumeTrue(sessionToken != null, "Session token is required for this test");
         // When & Then
-        mockMvc.perform(get("/api/v1/post/feed")
+        mockMvc.perform(get("/api/v1/post/random-feed")
                         .header("Authorization", sessionToken)
                         .param("page", "0")
                         .param("size", "20"))
@@ -185,7 +178,7 @@ public class UserFlowE2ETest {
         assumeTrue(sessionToken != null, "Session token is required for this test");
 
         // Request clustering
-        mockMvc.perform(get("/api/v1/feed/request_clustering")
+        mockMvc.perform(get("/api/v1/feed/request-clustering")
                         .header("Authorization", sessionToken))
                 .andExpect(status().isOk());
 
@@ -195,7 +188,7 @@ public class UserFlowE2ETest {
                 .andExpect(status().isOk());
 
         // Get ranked feed
-        var result = mockMvc.perform(get("/api/v1/feed/ranked_feed")
+        var result = mockMvc.perform(get("/api/v1/feed/ranked-feed")
                         .header("Authorization", sessionToken)
                         .param("page", "0")
                         .param("size", "20"))
@@ -203,12 +196,12 @@ public class UserFlowE2ETest {
                 .andExpect(jsonPath("$.content").exists())
                 .andReturn();
 
-        //If you want to show results, uncomment these lines
-/*        String responseContent = result.getResponse().getContentAsString();
-        System.out.println("\n=== Feed Content ===");
-        System.out.println(objectMapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(objectMapper.readTree(responseContent)));
-        System.out.println("==================\n");*/
+//        If you want to show results, uncomment these lines
+//        String responseContent = result.getResponse().getContentAsString();
+//        System.out.println("\n=== Feed Content ===");
+//        System.out.println(objectMapper.writerWithDefaultPrettyPrinter()
+//                .writeValueAsString(objectMapper.readTree(responseContent)));
+//        System.out.println("==================\n");
     }
 
     @Test
@@ -415,7 +408,7 @@ public class UserFlowE2ETest {
 
                 // Delete test post
                 try {
-                    postService.deletePost(postId, sessionToken);
+                    postValidationService.deletePost(postId, sessionToken);
                 } catch (Exception e) {
                     System.err.println("Error deleting post: " + e.getMessage());
                 }
@@ -443,13 +436,14 @@ public class UserFlowE2ETest {
     }
 
     @AfterAll
-    static void cleanup(@Autowired PostService postService,
-                        @Autowired CommentService commentService,
+    static void cleanup(@Autowired CommentService commentService,
                         @Autowired LikeService likeService,
                         @Autowired MockMvc mockMvc,
                         @Autowired ObjectMapper objectMapper,
                         @Autowired UserRepository userRepository,
-                        @Autowired UserService userService) {
+                        @Autowired UserService userService,
+                        @Autowired PostValidationService postValidationService
+    ) {
         try {
             if (postId != null) {
                 // Delete post comments
@@ -471,7 +465,7 @@ public class UserFlowE2ETest {
 
                 // Delete test post
                 try {
-                    postService.deletePost(postId, sessionToken);
+                    postValidationService.deletePost(postId, sessionToken);
                 } catch (Exception e) {
                     System.err.println("Error deleting post: " + e.getMessage());
                 }

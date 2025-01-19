@@ -2,12 +2,8 @@ package pl.jakubkonkol.tasteitserver.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-        import pl.jakubkonkol.tasteitserver.dto.*;
-        import pl.jakubkonkol.tasteitserver.model.enums.PostType;
-import pl.jakubkonkol.tasteitserver.service.IngredientService;
-import pl.jakubkonkol.tasteitserver.service.PostService;
-import pl.jakubkonkol.tasteitserver.service.TagService;
-import pl.jakubkonkol.tasteitserver.service.UserService;
+import pl.jakubkonkol.tasteitserver.dto.*;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IPostService;
 
 import java.util.List;
 
@@ -15,10 +11,7 @@ import java.util.List;
 @RequestMapping("/api/v1/creator")
 @RequiredArgsConstructor
 public class CreatorController {
-    private final PostService postService;
-    private final UserService userService;
-    private final TagService tagService;
-    private final IngredientService ingredientService;
+    private final IPostService postService;
 
     @PutMapping("/any")
     public ResponseEntity<List<PostDto>> searchPostsWithAnyIngredient(@RequestBody List<String> ingredientNames,

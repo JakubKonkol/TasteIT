@@ -39,7 +39,7 @@ public class CommentService implements ICommentService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
 
         if (commentDto.getContent() == null || commentDto.getContent().trim().isEmpty()) {
-            throw new IllegalArgumentException("Comment content cannot be empty.");
+            throw new IllegalArgumentException("Comment content cannot be empty");
         }
 
         Comment comment = Comment.builder()

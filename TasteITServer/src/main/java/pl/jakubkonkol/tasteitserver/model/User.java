@@ -8,10 +8,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
 import java.util.*;
 
-@Document(collection = "users")
+@Document
 @Data
 public class User implements UserDetails {
     @Id
@@ -36,7 +35,7 @@ public class User implements UserDetails {
     private List<String> following = new ArrayList<>();
     private List<FoodList> foodLists = new ArrayList<>();
     @DBRef
-    private List<Post> posts = new ArrayList<>();   //ustawiac przy budowaniu bazy
+    private List<Post> posts = new ArrayList<>();
     private Map<String, Double> clusterPreferences = new HashMap<>();
 
     @Override

@@ -1,8 +1,6 @@
 package pl.jakubkonkol.tasteitserver.service;
 
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -11,7 +9,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.jakubkonkol.tasteitserver.dto.PostDto;
 import pl.jakubkonkol.tasteitserver.model.Cluster;
 import pl.jakubkonkol.tasteitserver.model.Post;
 import pl.jakubkonkol.tasteitserver.model.User;

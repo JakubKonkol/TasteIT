@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pl.jakubkonkol.tasteitserver.monitor.ThreadPoolMonitor;
-import pl.jakubkonkol.tasteitserver.service.UserPreferencesAnalysisService;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;

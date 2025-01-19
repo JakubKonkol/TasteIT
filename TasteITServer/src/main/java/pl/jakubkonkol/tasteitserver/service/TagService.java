@@ -30,6 +30,7 @@ public class TagService implements ITagService {
         }
         return tagRepository.save(tag);
     }
+
     @Cacheable(value = "allTags", key = "'allTags'")
     public List<Tag> getAll() {
         return tagRepository.findAll();

@@ -1,8 +1,6 @@
 package pl.jakubkonkol.tasteitserver.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,8 +55,8 @@ public class FoodListController {
         foodListService.updateFoodlistName(sessionToken, foodListId, name);
         return ResponseEntity.ok(GenericResponse
                 .builder()
-                .status(HttpStatus.OK.value()).
-                message("Foodlist Updated")
+                .status(HttpStatus.OK.value())
+                .message("Foodlist Updated")
                 .build());
     }
 
@@ -69,8 +67,8 @@ public class FoodListController {
         foodListService.deleteFoodList(sessionToken, foodListId);
         return ResponseEntity.ok(GenericResponse
                 .builder()
-                .status(HttpStatus.OK.value()).
-                message("Foodlist Deleted")
+                .status(HttpStatus.OK.value())
+                .message("Foodlist Deleted")
                 .build());
     }
 
@@ -81,8 +79,8 @@ public class FoodListController {
         foodListService.addPostToFoodlist(sessionToken, foodListId, postId);
         return ResponseEntity.ok(GenericResponse
                 .builder()
-                .status(HttpStatus.OK.value()).
-                message("Foodlist Updated")
+                .status(HttpStatus.OK.value())
+                .message("Foodlist Updated")
                 .build());
     }
 
@@ -93,8 +91,8 @@ public class FoodListController {
         foodListService.deletePostInFoodlist(sessionToken, foodListId, postId);
         return ResponseEntity.ok(GenericResponse
                 .builder()
-                .status(HttpStatus.OK.value()).
-                message("Foodlist Updated")
+                .status(HttpStatus.OK.value())
+                .message("Foodlist Updated")
                 .build());
     }
 }

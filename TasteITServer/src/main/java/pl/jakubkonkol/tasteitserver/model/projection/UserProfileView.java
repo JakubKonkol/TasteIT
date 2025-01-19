@@ -1,9 +1,5 @@
 package pl.jakubkonkol.tasteitserver.model.projection;
 
-import pl.jakubkonkol.tasteitserver.model.Post;
-import pl.jakubkonkol.tasteitserver.model.Tag;
-
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 

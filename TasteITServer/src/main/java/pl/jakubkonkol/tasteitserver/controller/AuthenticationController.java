@@ -29,7 +29,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.login(userLoginRequest));
     }
     @GetMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") final String sessionToken) {
+    public ResponseEntity<GenericResponse> logout(@RequestHeader("Authorization") final String sessionToken) {
         authenticationService.logout(sessionToken);
         return ResponseEntity.ok().body(GenericResponse
                 .builder()

@@ -61,7 +61,7 @@ public class SearchController {
         return ResponseEntity.ok(pageDto);
     }
 
-    @GetMapping("/exclude_ingredients/posts")
+    @GetMapping("/exclude-ingredients/posts")
     public ResponseEntity<PageDto<PostDto>> searchIngredientsByName(@RequestParam List<String> ingredientNames,
                                                                           @RequestParam(defaultValue = "0") int page,
                                                                           @RequestParam(defaultValue = "20") int size) {

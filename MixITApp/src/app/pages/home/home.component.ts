@@ -62,6 +62,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.user = await this.userService.getUserByToken();
 
       if (this.user?.firstLogin) {
+        console.log('this.user?.firstLogin', this.user?.firstLogin);
         this.initializeCompleteAccountSplashScreen();
       }
       await this.initializePosts();

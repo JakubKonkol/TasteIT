@@ -13,7 +13,7 @@ public class PostDrinkFactory extends PostFactory {
         Post newPost = new Post();
         newPost.setPostType(PostType.DRINK);
 
-        PostMedia postMedia = createPostMedia(postObj, "strDrink", "strDrinkThumb", "Very nice drink, drop like I will give u head");
+        PostMedia postMedia = createPostMedia(postObj, "strDrink", "strDrinkThumb", "Very nice drink, drop like!");
         newPost.setPostMedia(postMedia);
 
         Recipe recipe = createRecipe(postObj, "strInstructions");

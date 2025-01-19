@@ -13,7 +13,7 @@ public class PostMealFactory extends PostFactory {
         Post newPost = new Post();
         newPost.setPostType(PostType.FOOD);
 
-        PostMedia postMedia = createPostMedia(postObj, "strMeal", "strMealThumb", "Very nice meal, drop like I will give u head");
+        PostMedia postMedia = createPostMedia(postObj, "strMeal", "strMealThumb", "Very nice meal, drop like!");
         newPost.setPostMedia(postMedia);
 
         Recipe recipe = createRecipe(postObj, "strInstructions");
@@ -23,8 +23,7 @@ public class PostMealFactory extends PostFactory {
         var tags = createTags(postObj);
         newPost.setTags(tags);
 
-        // TODO: Set proper user and tags, likes, comments, etc.
-        newPost.setUserId("0"); //userId=0 -> id admina
+        newPost.setUserId("0"); // userId = 0 -> id admina
         newPost.setLikes(null);
         newPost.setComments(null);
 

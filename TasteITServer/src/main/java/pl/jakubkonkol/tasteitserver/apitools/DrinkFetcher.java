@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pl.jakubkonkol.tasteitserver.factory.PostDrinkFactory;
 import pl.jakubkonkol.tasteitserver.model.Post;
@@ -29,6 +30,7 @@ public class DrinkFetcher {
     private final OkHttpClient client;
     private final IPostService postService;
     private static final Logger LOGGER = Logger.getLogger(DrinkFetcher.class.getName());
+//    @Value("${drinkfinder.url}")
     private final String drinkFinderURL = "https://thecocktaildb.com/api/json/v1/1/search.php?f=";
     private final PostDrinkFactory postFactory;
     private final IUserService userService;
@@ -57,7 +59,7 @@ public class DrinkFetcher {
     private List<Post> fetchDrinksByFirstLetter(String url) throws IOException {
         var req = new Request.Builder().url(url).build();
         try (var res = client.newCall(req).execute()) {
-            if(res.code() == 429){
+            if (res.code() == 429){
                 LOGGER.warning("Too many requests, waiting 10 seconds");
                 Thread.sleep(10000);
                 return fetchDrinksByFirstLetter(url);

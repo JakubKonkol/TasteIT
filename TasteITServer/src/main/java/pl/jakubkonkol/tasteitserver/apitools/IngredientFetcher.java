@@ -1,6 +1,7 @@
 package pl.jakubkonkol.tasteitserver.apitools;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pl.jakubkonkol.tasteitserver.exception.ApiRequestException;
 import pl.jakubkonkol.tasteitserver.factory.IngredientDrinkFactory;
@@ -11,7 +12,6 @@ import okhttp3.Response;
 import org.json.JSONObject;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IIngredientService;
 
-import java.awt.image.LookupOp;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -27,8 +27,10 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class IngredientFetcher {
     private static final Logger LOGGER = Logger.getLogger(IngredientFetcher.class.getName());
-    private final String ingredientFinderURL = "https://www.thecocktaildb.com/api/json/v1/1/search.php?i=";
-    private final String ingredientListURL = "https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list";
+//    @Value("${ingredientFinder.url}")
+    private final String ingredientFinderURL="https://www.thecocktaildb.com/api/json/v1/1/search.php?i=";
+//    @Value("${ingredientList.url}")
+    private final String ingredientListURL="https://www.thecocktaildb.com/api/json/v1/1/list.php?i=list";
     private final IIngredientService ingredientService;
     private final IngredientDrinkFactory ingredientFactory;
     private final OkHttpClient client;

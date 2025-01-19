@@ -3,16 +3,14 @@ package pl.jakubkonkol.tasteitserver.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.jakubkonkol.tasteitserver.dto.IngredientDto;
-import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
-import pl.jakubkonkol.tasteitserver.model.Ingredient;
+import pl.jakubkonkol.tasteitserver.model.GenericResponse;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IIngredientService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/ingredient")
@@ -26,42 +24,43 @@ public class IngredientController {
         return ResponseEntity.ok(ingredientDto);
     }
 
-    @PostMapping("/saveAll")
-    public ResponseEntity<List<IngredientDto>> saveAll(@RequestBody @NotEmpty(message = "Ingredients list cannot be empty") List<@Valid IngredientDto> ingredients) {
+    @PostMapping("/save-all")
+    public ResponseEntity<List<IngredientDto>> saveAll(
+            @RequestBody @NotEmpty(message = "Ingredients list cannot be empty") List<@Valid IngredientDto> ingredients
+    ) {
         var ingredientDtoList = ingredientService.saveAll(ingredients);
         return ResponseEntity.ok(ingredientDtoList);
     }
 
     @DeleteMapping("/{ingredientId}")
-    public ResponseEntity<String> deleteById(@PathVariable String ingredientId) {
+    public ResponseEntity<GenericResponse> deleteById(@PathVariable String ingredientId) {
         ingredientService.deleteById(ingredientId);
-        return ResponseEntity.ok("Ingredient deleted succesfully, Id: " + ingredientId);
+        return ResponseEntity.ok(GenericResponse
+                .builder()
+                .status(HttpStatus.OK.value())
+                .message("Ingredient deleted successfully")
+                .build());
     }
 
     @DeleteMapping("/")
-    public ResponseEntity<String> deleteAll() {
+    public ResponseEntity<GenericResponse> deleteAll() {
         ingredientService.deleteAll();
-        return ResponseEntity.ok("Ingredients deleted succesfully");
+        return ResponseEntity.ok(GenericResponse
+                .builder()
+                .status(HttpStatus.OK.value())
+                .message("Ingredients deleted successfully")
+                .build());
     }
 
     @GetMapping("/{ingredientId}")
     public ResponseEntity<IngredientDto> getIngredient(@PathVariable String ingredientId) {
         IngredientDto ingredientDto = ingredientService.getIngredient(ingredientId);
-        if (ingredientDto == null) {
-            throw new ResourceNotFoundException("Ingredient not found with Id: " + ingredientId);
-        }
         return ResponseEntity.ok(ingredientDto);
     }
 
     @GetMapping("/")
     public ResponseEntity<List<IngredientDto>> getAll() {
         return ResponseEntity.ok(ingredientService.getAll());
-
-    }
-
-    @GetMapping("/findByName")
-    public ResponseEntity<Ingredient> findByName(String name) {
-        return ResponseEntity.ok(ingredientService.findByName(name).get());
     }
 }
 
