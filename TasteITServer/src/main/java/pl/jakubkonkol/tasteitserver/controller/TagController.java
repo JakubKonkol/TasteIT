@@ -11,9 +11,8 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/tags")
+@RequestMapping("/api/v1/tag")
 public class TagController {
-
     private final ITagService tagService;
 
     @GetMapping("/basic")
@@ -21,11 +20,12 @@ public class TagController {
         List<Tag> tags = tagService.getBasicTags();
         return ResponseEntity.ok(tags);
     }
+
     @GetMapping("/")
     public ResponseEntity<List<Tag>> getAllTags(){
-        return
-                ResponseEntity.ok(tagService.getAll());
+        return ResponseEntity.ok(tagService.getAll());
     }
+
     @PostMapping("/")
     public ResponseEntity<Tag> saveTag(@Valid @RequestBody Tag tag){
         return ResponseEntity.ok(tagService.save(tag));

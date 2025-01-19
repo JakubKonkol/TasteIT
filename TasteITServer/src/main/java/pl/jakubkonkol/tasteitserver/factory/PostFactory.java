@@ -2,9 +2,7 @@ package pl.jakubkonkol.tasteitserver.factory;
 
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.jakubkonkol.tasteitserver.dto.IngredientDto;
 import pl.jakubkonkol.tasteitserver.model.*;
 import pl.jakubkonkol.tasteitserver.model.enums.TagType;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IIngredientService;
@@ -13,16 +11,13 @@ import pl.jakubkonkol.tasteitserver.service.interfaces.ITagService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
 public abstract class PostFactory {
-    @Autowired
     protected IIngredientService ingredientService;
-    @Autowired
     protected ITagService tagService;
 
     protected PostMedia createPostMedia(JSONObject postObj, String titleKey, String thumbKey, String defaultDescription) {
@@ -56,8 +51,13 @@ public abstract class PostFactory {
             String ingredientAmount = postObj.optString("strMeasure" + i, "").trim();
 
             if (ingredientName.isBlank() || ingredientAmount.isBlank()) break;
-
-            var optionalIngredient = this.ingredientService.findByName(ingredientName);
+            System.out.println("ingredient name " + ingredientName);
+//            Optional<Ingredient> optionalIngredient;
+//            try {
+                var optionalIngredient = ingredientService.findByName(ingredientName);
+//            } catch (Exception e) {
+//                System.out.println(e.getMessage());
+//            }
             if (optionalIngredient.isPresent()) {
                 var ingredient = optionalIngredient.get();
                 ingWrapper = ingredientService.convertToWrapper(ingredient);

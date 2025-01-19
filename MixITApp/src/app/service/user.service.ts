@@ -43,7 +43,7 @@ export class UserService {
 
   async updateUserProfile(userId: string, userProfile: UserProfile): Promise<User> {
     try {
-      const res = await taste_api.put(`user`, userProfile);
+      const res = await taste_api.put(`user/update-user-profile`, userProfile);
       return res.data;
     } catch (error: any) {
       this.logger.logError('Error updating user profile', error.response?.data || error);

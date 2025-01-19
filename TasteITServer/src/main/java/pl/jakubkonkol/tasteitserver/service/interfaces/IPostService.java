@@ -10,7 +10,6 @@ import pl.jakubkonkol.tasteitserver.model.Recipe;
 import pl.jakubkonkol.tasteitserver.model.projection.PostPhotoView;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public interface IPostService {
     void save(PostDto postDto);
@@ -32,6 +31,9 @@ public interface IPostService {
     PageDto<PostDto> getPostsExcludingIngredients(List<String> ingredientNames, Integer page, Integer size);
     PostDto convertToDto(Post post, String sessionToken);
     PageDto<PostDto> convertPostsToPageDto(String sessionToken, List<Post> posts, Pageable pageable);
-    void deletePost(String postId, String sessionToken);
-    void deletePostById(String postId, String sessionToken);
+    void deleteOnePostById(String postId, String sessionToken);
+    List<PostDto> searchPostsWithAnyIngredient(List<String> ingredientNames,
+                                               String sessionToken);
+    List<PostDto> searchPostsWithAllIngredients(List<String> ingredientNames,
+                                                String sessionToken);
 }

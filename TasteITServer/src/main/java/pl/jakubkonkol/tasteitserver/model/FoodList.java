@@ -3,7 +3,6 @@ package pl.jakubkonkol.tasteitserver.model;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@Document(collection = "foodlists")
+@Document
 @Data
 public class FoodList {
     @Id

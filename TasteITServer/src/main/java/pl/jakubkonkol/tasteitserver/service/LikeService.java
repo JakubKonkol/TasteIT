@@ -68,11 +68,14 @@ public class LikeService implements ILikeService {
     public void deleteAll() {
         List<Post> postsWithLikes = postRepository.findByLikesNotEmpty();
 
-        for (Post post : postsWithLikes) {
-            post.getLikes().clear();
+        if (!postsWithLikes.isEmpty()) {
+            for (Post post : postsWithLikes) {
+                post.getLikes().clear();
+            }
+
+            postRepository.saveAll(postsWithLikes);
+            likeRepository.deleteAll();
         }
-        postRepository.saveAll(postsWithLikes);
-        likeRepository.deleteAll();
     }
 
     private void handleLikeNotification(Post post, String likerId) {

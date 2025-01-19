@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pl.jakubkonkol.tasteitserver.exception.ApiRequestException;
 import pl.jakubkonkol.tasteitserver.factory.IngredientMealFactory;
@@ -25,7 +26,6 @@ import java.util.logging.Logger;
 /**
  * Author: Jakub Konkol
  * Fetcher for food data from theMealDB API
- * Probably needs more testing and error handling
  */
 @Component
 @RequiredArgsConstructor
@@ -37,10 +37,11 @@ public class FoodFetcher {
     private final OkHttpClient client;
     private final IngredientMealFactory ingredientFactory;
     private final PostMealFactory postFactory;
-    private final String foodFinderURL = "https://themealdb.com/api/json/v1/1/search.php?f=";
-    private final String ingredientListURL = "https://www.themealdb.com/api/json/v1/1/list.php?i=list";
+//    @Value("${foodFinder.url}")
+    private final String foodFinderURL="https://themealdb.com/api/json/v1/1/search.php?f=";
+//    @Value("${ingredientFoodList.url}")
+    private final String ingredientListURL="https://www.themealdb.com/api/json/v1/1/list.php?i=list";
     private final IUserService userService;
-//    private final ExecutorService executor = Executors.newFixedThreadPool(3);
 
     /**
      * Populates the database with food data

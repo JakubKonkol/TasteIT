@@ -21,5 +21,4 @@ public class IngredientDrinkFactory {
         ingredient.setType("Drink");
         return ingredient;
     }
-
 }

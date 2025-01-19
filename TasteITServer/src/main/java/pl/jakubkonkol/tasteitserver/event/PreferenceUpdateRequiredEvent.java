@@ -1,6 +1,5 @@
 package pl.jakubkonkol.tasteitserver.event;
 
-import lombok.Getter;
 import pl.jakubkonkol.tasteitserver.model.enums.PreferenceUpdateReason;
 
 import java.time.LocalDateTime;

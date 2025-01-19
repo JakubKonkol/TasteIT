@@ -2,14 +2,11 @@ package pl.jakubkonkol.tasteitserver.repository;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.repository.Aggregation;
 import pl.jakubkonkol.tasteitserver.model.Like;
 import pl.jakubkonkol.tasteitserver.model.Post;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import pl.jakubkonkol.tasteitserver.model.enums.PostType;
 import pl.jakubkonkol.tasteitserver.model.projection.PostPhotoView;
 
 import java.util.Date;
@@ -26,6 +23,7 @@ public interface PostRepository extends MongoRepository<Post, String> {
 
     @Query("{ 'comments': { $exists: true, $ne: [] } }")
     List<Post> findByCommentsNotEmpty();
+
     Optional<Post> findById(String id);
     Long countByUserId(String userId);
 
@@ -58,13 +56,6 @@ public interface PostRepository extends MongoRepository<Post, String> {
 
     @Query(value = "{ 'clusters.$id': ?0, 'createdDate': { $gt: ?1 } }", count = true)
     long countByClustersAndCreatedDateAfter(ObjectId clusterId, Date cutoffDate);
-
-    // Znajdź posty zawierające co najmniej jeden z podanych składników
-    @Query("{ 'recipe.ingredientsWithMeasurements.name': { $in: ?0 } }")
-    List<Post> findByAnyIngredientInRecipe(List<String> ingredientNames);
-
-    @Query("{ 'recipe.ingredientsWithMeasurements.name': { $not: { $elemMatch: { $nin: ?0 } } } }")
-    List<Post> findByIngredientsSubset(List<String> ingredientNames);
 
     @Query(value = "{'userId': {$ne: ?0}}", sort = "{'createdDate': -1}")
     List<Post> findTop100ByOrderByCreatedDateDescExcludingUser(String userId);

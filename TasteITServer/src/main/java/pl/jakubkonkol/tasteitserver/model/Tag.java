@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import pl.jakubkonkol.tasteitserver.model.enums.TagType;
 
-@Document(collection = "tags")
+@Document
 @Data
 public class Tag {
     @Id
