@@ -9,7 +9,7 @@ import pl.jakubkonkol.tasteitserver.model.enums.NotificationType;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "notifications")
+@Document
 @Data
 @Builder
 public class Notification {

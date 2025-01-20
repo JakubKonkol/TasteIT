@@ -31,7 +31,7 @@ export class PostService {
 
   async getFeed(page: number, size: number): Promise<Post[]> {
     let feed_url;
-    GlobalConfiguration.USE_RECOMMENDATION_ALGORITHM ? feed_url = `/feed/ranked_feed?page=${page}&size=${size}` : feed_url = `/post/feed?page=${page}&size=${size}`
+    GlobalConfiguration.USE_RECOMMENDATION_ALGORITHM ? feed_url = `/feed/ranked-feed?page=${page}&size=${size}` : feed_url = `/post/random-feed?page=${page}&size=${size}`
     try {
       const res = await taste_api.get(feed_url);
       const posts = res.data.content as Post[];

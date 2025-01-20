@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.jakubkonkol.tasteitserver.dto.IngredientDto;
 import pl.jakubkonkol.tasteitserver.model.*;
 import pl.jakubkonkol.tasteitserver.model.enums.TagType;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IIngredientService;
@@ -13,7 +12,6 @@ import pl.jakubkonkol.tasteitserver.service.interfaces.ITagService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -57,7 +55,7 @@ public abstract class PostFactory {
 
             if (ingredientName.isBlank() || ingredientAmount.isBlank()) break;
 
-            var optionalIngredient = this.ingredientService.findByName(ingredientName);
+            var optionalIngredient = ingredientService.findByName(ingredientName);
             if (optionalIngredient.isPresent()) {
                 var ingredient = optionalIngredient.get();
                 ingWrapper = ingredientService.convertToWrapper(ingredient);

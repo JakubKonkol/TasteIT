@@ -15,7 +15,6 @@ import pl.jakubkonkol.tasteitserver.model.UserAction;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -36,7 +35,7 @@ public class UserActionAspect {
 
             // Asynchronous save to database
             CompletableFuture.runAsync(() -> {
-                mongoTemplate.save(action, "userActions");
+                mongoTemplate.save(action, "userAction");
                 eventPublisher.publishEvent(new UserActionEvent(userId, action));
             });
         } catch (Exception e) {

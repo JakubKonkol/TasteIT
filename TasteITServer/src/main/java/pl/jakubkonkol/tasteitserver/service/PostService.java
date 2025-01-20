@@ -23,20 +23,16 @@ import pl.jakubkonkol.tasteitserver.model.Recipe;
 import pl.jakubkonkol.tasteitserver.model.User;
 import pl.jakubkonkol.tasteitserver.model.projection.PostPhotoView;
 import pl.jakubkonkol.tasteitserver.model.projection.UserShort;
-import pl.jakubkonkol.tasteitserver.repository.CommentRepository;
+import pl.jakubkonkol.tasteitserver.model.value.PostWithMatchCount;
 import pl.jakubkonkol.tasteitserver.repository.LikeRepository;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.jakubkonkol.tasteitserver.repository.UserRepository;
 import pl.jakubkonkol.tasteitserver.service.interfaces.IPostService;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.beans.factory.annotation.Autowired;
-import pl.jakubkonkol.tasteitserver.exception.UnauthorizedException;
+import pl.jakubkonkol.tasteitserver.service.interfaces.IUserService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,25 +43,19 @@ public class PostService implements IPostService {
     private final MongoTemplate mongoTemplate;
     private final ModelMapper modelMapper;
     private final PostRepository postRepository;
-
-    @Lazy
-    @Autowired
-    private UserService userService;
-
+    private final IUserService userService;
     private final LikeRepository likeRepository;
-    private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
 
     @CacheEvict(value = {"posts", "postById", "userPosts", "postsByTag", "likedPosts", "postsAll"}, allEntries = true)
     public void save(PostDto postDto) {
         Post post = convertToEntity(postDto);
-        postRepository.save(Objects.requireNonNull(post, "Post cannot be null."));
+        postRepository.save(Objects.requireNonNull(post, "Post cannot be null"));
     }
 
     @CacheEvict(value = {"posts", "postById", "userPosts", "postsByTag", "likedPosts", "postsAll"}, allEntries = true)
     public List<Post> saveAll(List<Post> posts) {
         return postRepository.saveAll(
-                Objects.requireNonNull(posts, "List of posts cannot be null."));
+                Objects.requireNonNull(posts, "List of posts cannot be null"));
     }
 
     @CacheEvict(value = {"posts", "postById", "userPosts", "postsByTag", "likedPosts", "postsAll"}, allEntries = true)
@@ -74,7 +64,7 @@ public class PostService implements IPostService {
     }
 
     @CacheEvict(value = {"posts", "postById", "userPosts", "postsByTag", "likedPosts", "postsAll"}, allEntries = true)
-    public void deletePostById(String postId, String sessionToken) {
+    public void deleteOnePostById(String postId, String sessionToken) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Post with id " + postId + " not found"));
@@ -108,23 +98,9 @@ public class PostService implements IPostService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Post with id " + postId + " not found"));
 
-        PostDto postDto = convertToDto(post, sessionToken);
+        if (post.getUserId() == null) throw new IllegalArgumentException("Post User ID cannot be null");
 
-        if (post.getUserId() == null) {
-            throw new IllegalArgumentException("Post user ID cannot be null");
-        }
-
-        UserShort userShort = userService.findUserShortByUserId(post.getUserId());
-        if (userShort == null) {
-            throw new IllegalArgumentException("User not found for ID: " + post.getUserId());
-        }
-
-/*        postAuthorDto.setUserId(userShort.getUserId());
-        postAuthorDto.setDisplayName(userShort.getDisplayName());
-        postAuthorDto.setProfilePicture(userShort.getProfilePicture());
-        postDto.setPostAuthorDto(postAuthorDto);*/
-
-        return postDto;
+        return convertToDto(post, sessionToken);
     }
 
     public PageDto<PostDto> getRandomPosts(Integer page, Integer size, String sessionToken) {
@@ -138,29 +114,11 @@ public class PostService implements IPostService {
         List<Post> posts = results.getMappedResults();
 
         if (posts.isEmpty()) {
-            throw new NoSuchElementException("No random posts found in repository");
+            throw new ResourceNotFoundException("No random posts found in repository");
         }
 
-        List<String> userIds = posts.stream()
-                .map(Post::getUserId)
-                .distinct()
-                .toList();
-
-        List<UserShort> userShorts = userService.getUserShortByIdIn(userIds);
-
-        Map<String, UserShort> userShortMap = userShorts.stream()
-                .collect(Collectors.toMap(UserShort::getUserId, userShort -> userShort));
-
-        List<PostDto> postDtos = posts.stream()
-                .map(post -> {
-                    PostDto postDto = convertToDto(post, sessionToken);
-                    UserShort userShort = userShortMap.get(post.getUserId());
-                    if (userShort != null) {
-                        postDto.setPostAuthorDto(convertToPostAuthorDto(userShort));
-                    }
-                    return postDto;
-                })
-                .toList();
+        Map<String, UserShort> userShortMap = getAuthors(posts);
+        List<PostDto> postDtos = fillPostsWithAuthors(sessionToken, posts, userShortMap);
 
         PageImpl<PostDto> pageImpl = new PageImpl<>(postDtos, pageable, postDtos.size());
         return getPageDto(pageImpl);
@@ -170,19 +128,15 @@ public class PostService implements IPostService {
                                         int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Query query = new Query();
-
         query.addCriteria(Criteria.where("postMedia.title").regex(title, "i"));
 
         if (postType != null) {
             query.addCriteria(Criteria.where("postType").is(postType));
         }
-
         long total = mongoTemplate.count(query, Post.class);
 
         query.with(pageable);
-
         List<Post> posts = mongoTemplate.find(query, Post.class);
-
         return getPostDtoPageDto(posts, total, pageable, sessionToken);
     }
 
@@ -190,12 +144,10 @@ public class PostService implements IPostService {
                                                       String sessionToken) {
         var foundPosts = postRepository.findAll();
 
-
         Set<String> ingredientNamesLower = ingredientNames.stream()
                 .map(String::toLowerCase)
                 .collect(Collectors.toSet());
 
-        // Filtrowanie i sortowanie postów
         var filteredPosts = foundPosts.stream()
                 .filter(post -> post.getRecipe() != null &&
                         post.getRecipe().getIngredientsWithMeasurements() != null)
@@ -207,15 +159,13 @@ public class PostService implements IPostService {
                                 .filter(ingredient -> ingredientNamesLower.contains(
                                         ingredient.getName().toLowerCase()))
                                 .count()))
-                .sorted(Comparator.comparingInt(PostWithMatchCount::getMatchCount).reversed())
-                .map(PostWithMatchCount::getPost)
-                .collect(Collectors.toList());
-
-        List<PostDto> filteredPostsDtos = filteredPosts.stream()
-                .map(post -> convertToDto(post, sessionToken))
+                .sorted(Comparator.comparingInt(PostWithMatchCount::matchCount).reversed())
+                .map(PostWithMatchCount::post)
                 .toList();
 
-        return filteredPostsDtos;
+        return filteredPosts.stream()
+                .map(post -> convertToDto(post, sessionToken))
+                .toList();
     }
 
     public List<PostDto> searchPostsWithAllIngredients(List<String> ingredientNames,
@@ -226,7 +176,6 @@ public class PostService implements IPostService {
                 .map(String::toLowerCase)
                 .collect(Collectors.toSet());
 
-        // Filtrowanie i sortowanie postów
         var filteredPosts = foundPosts.stream()
                 .filter(post -> post.getRecipe() != null &&
                         post.getRecipe().getIngredientsWithMeasurements() != null
@@ -239,15 +188,13 @@ public class PostService implements IPostService {
                                 .filter(ingredient -> ingredientNamesLower.contains(
                                         ingredient.getName().toLowerCase()))
                                 .count()))
-                .sorted(Comparator.comparingInt(PostWithMatchCount::getMatchCount).reversed())
-                .map(PostWithMatchCount::getPost)
-                .collect(Collectors.toList());
-
-        List<PostDto> filteredPostsDtos = filteredPosts.stream()
-                .map(post -> convertToDto(post, sessionToken))
+                .sorted(Comparator.comparingInt(PostWithMatchCount::matchCount).reversed())
+                .map(PostWithMatchCount::post)
                 .toList();
 
-        return filteredPostsDtos;
+        return filteredPosts.stream()
+                .map(post -> convertToDto(post, sessionToken))
+                .toList();
     }
 
     public PageDto<PostDto> searchPostsByTagName(String tagId, Integer page, Integer size) {
@@ -306,7 +253,7 @@ public class PostService implements IPostService {
 
     public Recipe getPostRecipe(String postId) {
         Post post = postRepository.findById(postId).orElseThrow(
-                () -> new NoSuchElementException("Post with id " + postId + " not found"));
+                () -> new ResourceNotFoundException("Post with id " + postId + " not found"));
         return post.getRecipe();
     }
 
@@ -326,14 +273,8 @@ public class PostService implements IPostService {
 
         Post post = convertToEntity(postDto);
 
+        if (post.getRecipe() == null) throw new ResourceNotFoundException("Post Recipe cannot be null");
         post.setUserId(currentUser.getUserId());
-
-        if (post.getUserId() == null) {
-            throw new NoSuchElementException("Missing author in post exception");
-        }
-        if (post.getRecipe() == null) {
-            throw new NoSuchElementException("Missing recipe in post exception");
-        }
 
         Post savedPost = postRepository.save(post);
 
@@ -345,45 +286,28 @@ public class PostService implements IPostService {
         PostAuthorDto authorDto = convertToPostAuthorDto(currentUser);
         responseDto.setPostAuthorDto(authorDto);
 
-        if (responseDto.getPostAuthorDto() == null) {
-            throw new NoSuchElementException("Missing author in returned post exception");
-        }
-
+        if (responseDto.getPostAuthorDto() == null) throw new ResourceNotFoundException("Missing author in created Post");
         return responseDto;
     }
 
     public PostDto convertToDto(Post post, String sessionToken) {
-        PostDto postDto = modelMapper.map(post, PostDto.class);
+        if (post.getUserId() == null) throw new ResourceNotFoundException("Missing Post Author ID");
 
+        PostDto postDto = modelMapper.map(post, PostDto.class);
         postDto.setLikesCount((long) post.getLikes().size());
         postDto.setCommentsCount((long) post.getComments().size());
+        UserShort currentUser = userService.getCurrentUserShortBySessionToken(sessionToken);
 
+        var like = likeRepository.findByPostIdAndUserId(post.getPostId(),
+                currentUser.getUserId());
+        postDto.setLikedByCurrentUser(like.isPresent());
 
-        try {
-            UserShort currentUser = userService.getCurrentUserShortBySessionToken(sessionToken);
-            var like = likeRepository.findByPostIdAndUserId(post.getPostId(),
-                    currentUser.getUserId());
+        UserShort author = userService.findUserShortByUserId(
+                post.getUserId());
 
-            // nie wiem czy ustawialbym to pole w tym miejscu moze np w getRandomPosts i getPost? jest to jednak metoda konkretnie do konwersji
-            //" Aby wiedzieć, czy dany użytkownik jest obserwowany przez innego użytkownika,
-            // potrzebujesz dodatkowego kontekstu, czyli danych o użytkowniku aktualnie zalogowanym (np. currentUser).
-            // Ta informacja nie powinna być dostępna bezpośrednio w metodzie konwertującej."
-            postDto.setLikedByCurrentUser(like.isPresent());
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Nie można znaleźć czy post został polikowany - UserId: " + post.getUserId() + ", PostId: " + post.getPostId());
-        }
+        PostAuthorDto postAuthorDto = convertToPostAuthorDto(author);
+        postDto.setPostAuthorDto(postAuthorDto);
 
-        try {
-            UserShort author = userService.findUserShortByUserId(
-                    post.getUserId());
-
-            PostAuthorDto postAuthorDto = convertToPostAuthorDto(author);
-            postDto.setPostAuthorDto(postAuthorDto);
-        }
-        catch (Exception e) {
-            System.out.println("Nie można znaleźć autora o UserId: " + post.getUserId() + ", PostId: " + post.getPostId());
-        }
         return postDto;
     }
 
@@ -406,23 +330,9 @@ public class PostService implements IPostService {
 
     public PageDto<PostDto> convertPostsToPageDto(String sessionToken, List<Post> posts,
                                                   Pageable pageable) {
-        List<String> userIds = posts.stream()
-                .map(Post::getUserId)
-                .distinct()
-                .toList();
+        Map<String, UserShort> userShortMap = getAuthors(posts);
 
-        List<UserShort> userShorts = userService.getUserShortByIdIn(userIds);
-
-        Map<String, UserShort> userShortMap = userShorts.stream()
-                .collect(Collectors.toMap(UserShort::getUserId, userShort -> userShort));
-
-        List<PostDto> postDtos = posts.stream()
-                .map(post -> {
-                    PostDto postDto = convertToDto(post, sessionToken);
-                    addAuthorInfo(post, userShortMap, postDto);
-                    return postDto;
-                })
-                .toList();
+        List<PostDto> postDtos = fillPostsWithAuthors(sessionToken, posts, userShortMap);
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), postDtos.size());
@@ -430,6 +340,16 @@ public class PostService implements IPostService {
 
         PageImpl<PostDto> pageImpl = new PageImpl<>(paginatedPosts, pageable, postDtos.size());
         return getPageDto(pageImpl);
+    }
+
+    private List<PostDto> fillPostsWithAuthors(String sessionToken, List<Post> posts, Map<String, UserShort> userShortMap) {
+        return posts.stream()
+                .map(post -> {
+                    PostDto postDto = convertToDto(post, sessionToken);
+                    addAuthorInfo(post, userShortMap, postDto);
+                    return postDto;
+                })
+                .toList();
     }
 
     private void addAuthorInfo(Post post, Map<String, UserShort> userShortMap, PostDto postDto) {
@@ -447,39 +367,15 @@ public class PostService implements IPostService {
         return postAuthorDto;
     }
 
-    //klasa pomocnicza
-    private static class PostWithMatchCount {
-        private final Post post;
-        private final int matchCount;
+    private Map<String, UserShort> getAuthors(List<Post> posts) {
+        List<String> userIds = posts.stream()
+                .map(Post::getUserId)
+                .distinct()
+                .toList();
 
-        public PostWithMatchCount(Post post, int matchCount) {
-            this.post = post;
-            this.matchCount = matchCount;
-        }
+        List<UserShort> userShorts = userService.getUserShortByIdIn(userIds);
 
-        public Post getPost() {
-            return post;
-        }
-
-        public int getMatchCount() {
-            return matchCount;
-        }
-    }
-
-    @Override
-    @CacheEvict(value = {"posts", "postById", "userPosts", "postsByTag", "likedPosts", "postsAll"}, allEntries = true)
-    public void deletePost(String postId, String sessionToken) {
-        // Sprawdź, czy użytkownik jest właścicielem posta
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("Post not found"));
-
-        User user = userRepository.findBySessionToken(sessionToken)
-                .orElseThrow(() -> new UnauthorizedException("User not found"));
-
-        if (!post.getUserId().equals(user.getUserId())) {
-            throw new UnauthorizedException("User is not authorized to delete this post");
-        }
-
-        postRepository.deleteById(postId);
+        return userShorts.stream()
+                .collect(Collectors.toMap(UserShort::getUserId, userShort -> userShort));
     }
 }

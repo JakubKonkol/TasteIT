@@ -47,7 +47,7 @@ export class NotificationsService{
   private initializeWebSocketConnection(): void {
     this.stompClient.onConnect = async () => {
       console.log('Connected to TasteIT WebSocket!');
-      this.stompClient.subscribe('/user/topic/notifications', message => {
+      this.stompClient.subscribe('/user/topic/notification', message => {
         const notification: Notification = JSON.parse(message.body);
 
         const currentNotifications = this.notifications.value;
@@ -58,7 +58,7 @@ export class NotificationsService{
         this.notificationToastService.show(notification);
       });
 
-      this.stompClient.subscribe('/user/topic/notifications/read', message => {
+      this.stompClient.subscribe('/user/topic/notification/read', message => {
         const notificationId = message.body;
         const currentNotifications = this.notifications.value;
 
@@ -77,7 +77,7 @@ export class NotificationsService{
   }
   private async fetchInitialNotifications(): Promise<void> {
     try {
-      const notificationsRes = await taste_api.get('notifications', {
+      const notificationsRes = await taste_api.get('notification', {
         params: {
           page: 0,
           size: 10
@@ -88,7 +88,7 @@ export class NotificationsService{
       const notifications = notificationsRes.data?.content || [];
       this.notifications.next(notifications as Notification[]);
 
-      const countRes = await taste_api.get('notifications/unread/count');
+      const countRes = await taste_api.get('notification/unread/count');
       const count = typeof countRes.data === 'number' ? countRes.data : 0;
       this.unreadCount.next(count);
     } catch (error: any) {
@@ -100,7 +100,7 @@ export class NotificationsService{
   }
   async markAsRead(notificationId: string): Promise<void> {
     try {
-      await taste_api.put(`notifications/${notificationId}/read`);
+      await taste_api.put(`notification/${notificationId}/read`);
 
       this.unreadCount.next(this.unreadCount.value - 1);
 

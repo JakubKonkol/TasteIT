@@ -1,6 +1,5 @@
 package pl.jakubkonkol.tasteitserver.event;
 
-import lombok.Getter;
 import pl.jakubkonkol.tasteitserver.model.UserAction;
 
 import java.time.LocalDateTime;

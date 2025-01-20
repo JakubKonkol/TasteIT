@@ -17,5 +17,5 @@ export const GlobalConfiguration = {
    * If true, the recommendation algorithm will be used to suggest posts to users.
    * If false, basic feed will be used.
    */
-  USE_RECOMMENDATION_ALGORITHM: false
+  USE_RECOMMENDATION_ALGORITHM: true
 }
