@@ -53,7 +53,7 @@ public class FoodFetcher {
         var foodPosts = searchFoodForEveryLetter();
         List<Post> posts = postService.saveAll(foodPosts);
 
-        User admin = userService.getUserById("0");
+        User admin = userService.getSimpleUserById("0");
         admin.getPosts().addAll(posts);
         userService.saveUser(admin);
 

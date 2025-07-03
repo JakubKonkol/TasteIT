@@ -93,6 +93,9 @@ import { PostDetailsComponent } from './pages/post-builder/post-details/post-det
 import { PostSummaryComponent } from './pages/post-builder/post-summary/post-summary.component';
 import { PBNavigationComponent } from './pages/post-builder/pbnavigation/pbnavigation.component';
 import {PostBuilderService} from "./pages/post-builder/shared/postBuilder.service";
+
+import { BadgesComponent } from './pages/badges/badges.component';
+
 import {CreatorService} from "./service/creator.service";
 import { ConfirmPostDeletionComponent } from './components/dialogs/confirm-post-deletion/confirm-post-deletion.component';
 import {NotificationsService} from "./service/notifications.service";
@@ -103,6 +106,7 @@ import {SearchStateService} from "./service/search.state.service";
 import { FeedSettingsComponent } from './pages/feed-settings/feed-settings.component';
 import {ConfigurationService} from "./service/configuration.service";
 import { AppInfoComponent } from './pages/app-info/app-info.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -149,6 +153,7 @@ import { AppInfoComponent } from './pages/app-info/app-info.component';
     PostDetailsComponent,
     PostSummaryComponent,
     PBNavigationComponent,
+    BadgesComponent,
     ConfirmPostDeletionComponent,
     NotificationsComponent,
     NotificationToastComponent,

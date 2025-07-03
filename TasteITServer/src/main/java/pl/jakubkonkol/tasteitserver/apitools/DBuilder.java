@@ -26,6 +26,7 @@ public class DBuilder {
     private final ICommentService commentService;
     private final AdminUserFactory adminUserFactory;
     private final ITagService tagService;
+    private final BadgeService badgeService;
 
     private static final Logger LOGGER = Logger.getLogger(DBuilder.class.getName());
 
@@ -42,20 +43,19 @@ public class DBuilder {
      * Uncomment @PostConstruct if u want to populate database with data from API
      */
 //    @PostConstruct
-    public void buildDataBase()  {
-        try {
-            createDefaultAdminAccount();
-            ingredientService.deleteAll();
-            commentService.deleteAll();
-            likeService.deleteAll();
-            postService.deleteAll();
-            tagService.deleteAll();
-            LOGGER.log(Level.INFO, "Database cleared, building new one");
-            tagService.saveBasicTags();
-            ingredientFetcher.populateDBWithIngredients();
-            drinkFetcher.populateDBWithDrinks();
-            foodFetcher.populateDBWithFood();
-
+    public void buildDataBase() throws IOException {
+        ingredientService.deleteAll();
+        commentService.deleteAll();
+        likeService.deleteAll();
+        postService.deleteAll();
+        tagService.deleteAll();
+        LOGGER.log(Level.INFO, "Database cleared, building new one");
+        tagService.saveBasicTags();
+        badgeService.saveBadgeData();
+        foodFetcher.populateDBWithFood();
+        ingredientFetcher.populateDBWithIngredients();
+        drinkFetcher.populateDBWithDrinks();
+      
             LOGGER.log(Level.INFO, "Database built");
         } catch (IOException e){
             LOGGER.log(Level.SEVERE, e.getMessage());

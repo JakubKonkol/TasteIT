@@ -31,6 +31,27 @@
     </div>
       <p class="user-bio">{{user.bio || 'No bio available'}}</p>
   </div>
+    <div *ngIf="(user?.badges?.length ?? 0) > 0; else noBadges">
+      <h3>Badges</h3>
+      <table class="badges-table">
+        <tr>
+          <ng-container *ngFor="let badge of user.badges">
+            <td *ngIf="badge.earned" class="badge-cell">
+              <img
+                [src]="badge.image ? badge.image : ('assets/badges/badge' + ('00' + badge.id).slice(-3) + '.png')"
+                alt="{{ badge.name }}"
+                class="badge-image"
+              />
+              <h4>{{ badge.name }}</h4>
+            </td>
+          </ng-container>
+        </tr>
+      </table>
+    </div>
+    <ng-template #noBadges>
+      <p>No data fora badges</p>
+    </ng-template>
+
   <div class="user-actions">
     <div class="actions" *ngIf="isVisitor()">
       <button class="button-secondary" matRipple [ngClass]="user.isFollowing ? '' : 'active'" (click)="toggleFollow()"> {{user.isFollowing ? 'Following' : 'Follow' }} </button>
@@ -38,8 +59,9 @@
 <!--      <button class="button-secondary" matRipple> Report </button>-->
     </div>
     <div class="actions" *ngIf="!isVisitor()">
+      <button class="button-secondary" matRipple> Edit Profile </button>
+      <button class="button-secondary" matRipple (click)="goto('badges')"> Badges </button>
       <button class="button-secondary" matRipple (click)="goto('setup-profile')"> Edit Profile </button>
-<!--      <button class="button-secondary" matRipple> Badges </button>-->
       <button class="button-secondary" matRipple (click)="goto('foodlists')"> Foodlists </button>
     </div>
   </div>

@@ -1,3 +1,35 @@
+h3 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.badges-table {
+  margin: 0 auto;
+  border-collapse: separate;
+  border-spacing: 10px;
+}
+
+.badge-cell {
+  text-align: center;
+  vertical-align: middle;
+  padding: 10px;
+}
+
+.badge-image {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.badge-cell h4 {
+  margin: 8px 0 0;
+  color: #fff;
+  font-size: 13px;
+  text-align: center;
+}
+
 .container{
   padding: 1rem;
   box-sizing: border-box;

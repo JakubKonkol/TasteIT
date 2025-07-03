@@ -79,7 +79,7 @@ public class UserPreferencesAnalysisService implements IUserPreferencesAnalysisS
 
                 if (userId != null && matchedClusters != null) {
                     if(!matchedClusters.isEmpty()) {
-                        User user = userService.getUserById(userId);
+                        User user = userService.getSimpleUserById(userId);
                         Map<String, Double> clusterPreferences = processClusters(matchedClusters);
 
                         user.setClusterPreferences(clusterPreferences);
@@ -123,7 +123,7 @@ public class UserPreferencesAnalysisService implements IUserPreferencesAnalysisS
      * }
      */
     private Map<String, Object> prepareUserDataWithActions(String userId, List<UserAction> actions) {
-        User user = userService.getUserById(userId);
+        User user = userService.getSimpleUserById(userId);
 
         Set<String> postIds = actions.stream()
                 .map(action -> action.getMetadata().get("postId").toString())

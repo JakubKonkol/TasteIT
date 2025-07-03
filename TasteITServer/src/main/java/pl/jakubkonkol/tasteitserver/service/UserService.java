@@ -14,6 +14,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import pl.jakubkonkol.tasteitserver.dto.*;
+import pl.jakubkonkol.tasteitserver.model.*;
 import pl.jakubkonkol.tasteitserver.event.PreferenceUpdateRequiredEvent;
 import pl.jakubkonkol.tasteitserver.exception.ResourceNotFoundException;
 import pl.jakubkonkol.tasteitserver.model.Ingredient;
@@ -23,6 +24,7 @@ import pl.jakubkonkol.tasteitserver.model.UserAction;
 import pl.jakubkonkol.tasteitserver.model.enums.NotificationType;
 import pl.jakubkonkol.tasteitserver.model.projection.UserProfileView;
 import pl.jakubkonkol.tasteitserver.model.projection.UserShort;
+import pl.jakubkonkol.tasteitserver.repository.CommentRepository;
 import pl.jakubkonkol.tasteitserver.repository.PostRepository;
 import pl.jakubkonkol.tasteitserver.repository.UserActionRepository;
 import pl.jakubkonkol.tasteitserver.repository.UserRepository;
@@ -43,24 +45,40 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final IngredientService ingredientService;
     private final TagService tagService;
     private final UserActionRepository userActionRepository;
     private final IPostValidationService postValidationService;
     private final NotificationEventPublisher notificationEventPublisher;
+    private final NewBadgeService newBadgeService;
     private final ApplicationEventPublisher eventPublisher;
     private final IPostRankingService postRankingService;
+
     private static final java.util.logging.Logger LOGGER = Logger.getLogger(UserService.class.getName());
 
-    @Cacheable(value = "userById", key = "#userId")
+//    @Cacheable(value = "userById", key = "#userId")
     public UserReturnDto getUserDtoById(String userId, String sessionToken) {
-        User user = getUserById(userId);
+        User user = getFullUserById(userId);
         User currentUser = getCurrentUserBySessionToken(sessionToken);
-
         UserReturnDto userReturnDto = convertToDto(user);
         userReturnDto.setIsFollowing(currentUser.getFollowing().contains(userId));
-
+        List<BadgeDto> allBadges = newBadgeService.updateBadges(user);
+        userReturnDto.setBadges(allBadges);
         return userReturnDto;
+    }
+
+    public User getSimpleUserById(String userId) { //return users without additional collections like his posts
+        return userRepository.findById(userId).orElseThrow(
+                () -> new NoSuchElementException("User with id " + userId + " not found"));
+    }
+
+    public User getFullUserById(String userId){ //returns user with additional collections from other repositories
+        User user = getSimpleUserById(userId);
+        user.setPosts(postRepository.findByUserId(userId));
+        List<Comment> comments = commentRepository.findByUserId(userId);
+        user.setCreatedComments(comments);
+        return user;
     }
 
     public UserReturnDto getUserProfileView(String userId, String sessionToken) {
@@ -109,7 +127,7 @@ public class UserService implements IUserService {
         @CacheEvict(value = "userBySessionToken", key = "#sessionToken")
     })
     public void updateUserTags(String userId, UserTagsDto userTagsDto, String sessionToken) {
-        User user = getUserById(userId);
+        User user = getSimpleUserById(userId);
         user.setTags(userTagsDto.getTags());
         userRepository.save(user);
 
@@ -192,7 +210,7 @@ public class UserService implements IUserService {
 
     private PageDto<UserReturnDto> getUserReturnDtoPageDto(User currentUser, Page<UserShort> userPage, Pageable pageable) {
         List<UserReturnDto> userDtos = userPage.getContent().stream().map(user -> {
-            UserReturnDto userReturnDto = new UserReturnDto();
+            UserReturnDto userReturnDto = new UserReturnDto(); //todo
             userReturnDto.setUserId(user.getUserId());
             userReturnDto.setDisplayName(user.getDisplayName());
             userReturnDto.setProfilePicture(user.getProfilePicture());
@@ -216,10 +234,12 @@ public class UserService implements IUserService {
         return pageDto;
     }
 
+
     public User getUserById(String userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("User with id " + userId + " not found"));
     }
+
 
     public User getCurrentUserBySessionToken(String sessionToken) {
         return userRepository.findBySessionToken(sessionToken)
@@ -232,7 +252,7 @@ public class UserService implements IUserService {
     }
 
     private UserReturnDto convertToDto(User user) {
-        UserReturnDto userReturnDto = modelMapper.map(user, UserReturnDto.class);
+        UserReturnDto userReturnDto = modelMapper.map(user, UserReturnDto.class); //todo
         userReturnDto.setFollowersCount((long) user.getFollowers().size());
         userReturnDto.setFollowingCount((long) user.getFollowing().size());
 
@@ -259,7 +279,7 @@ public class UserService implements IUserService {
     }
 
     private UserReturnDto convertUserProfileViewToUserReturnDto(String userId, UserProfileView userProfileView, User currentUser) {
-        UserReturnDto userReturnDto = new UserReturnDto();
+        UserReturnDto userReturnDto = new UserReturnDto(); //todo
         userReturnDto.setUserId(userProfileView.getUserId());
         userReturnDto.setEmail(userProfileView.getEmail());
         userReturnDto.setDisplayName(userProfileView.getDisplayName());
@@ -329,6 +349,11 @@ public class UserService implements IUserService {
         return user.getBannedTags().stream()
                 .map(tagService::convertToDto)
                 .toList();
+    }
+
+    public void updateUserBadges(String userId, List<Badge> updatedBadges) { 
+        checkIfUserExists(userId);
+        userRepository.updateUserBadgesByUserId(userId, updatedBadges);
     }
 
     public List<User> findUsersActiveInLast30Days() {

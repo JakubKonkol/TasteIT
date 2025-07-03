@@ -39,7 +39,7 @@ public class DrinkFetcher {
         var drinks = fetchDrinks();
         List<Post> posts = postService.saveAll(drinks);
 
-        User admin = userService.getUserById("0");
+        User admin = userService.getSimpleUserById("0");
         admin.getPosts().addAll(posts);
         userService.saveUser(admin);
 

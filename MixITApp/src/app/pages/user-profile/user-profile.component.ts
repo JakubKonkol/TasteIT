@@ -17,7 +17,7 @@ export class UserProfileComponent implements OnInit{
     private router: Router,
     public navigationService: NavigationService
   ) { }
-  user: User = {};
+  user: User = {badges: [] };
   userId: string = '';
   loggedUserId: string = '';
   userPosts: Post[] = [];
@@ -27,13 +27,14 @@ export class UserProfileComponent implements OnInit{
     this.isLoading = true;
     try {
       this.userId = this.route.snapshot.params['id'] as string;
+      this.user = await this.userService.getUserById(this.route.snapshot.params['id'] as string)
       const [user, posts, loggedUser] = await Promise.all([
         this.userService.getUserProfileById(this.userId),
         this.userService.getUserPosts(this.userId, this.currentPostPage),
         this.userService.getUserByToken(),
       ]);
 
-      this.user = user;
+      // this.user = user;
       this.userPosts = posts;
       this.loggedUserId = loggedUser.userId!;
     } catch (error) {
@@ -60,6 +61,7 @@ export class UserProfileComponent implements OnInit{
       : await this.userService.followUser(this.user.userId!);
 
     this.user = await this.userService.getUserProfileById(this.user.userId!);
+    location.reload();
   }
   goto(url: string) {
     this.router.navigate([url]);

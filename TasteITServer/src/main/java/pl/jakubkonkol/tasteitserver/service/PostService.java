@@ -270,7 +270,8 @@ public class PostService implements IPostService {
     @CacheEvict(value = {"posts", "postById", "userPosts", "postsByTag", "likedPosts", "postsAll"}, allEntries = true)
     public PostDto createPost(PostDto postDto, String sessionToken) {
         UserShort currentUser = userService.getCurrentUserShortBySessionToken(sessionToken);
-
+        //todo potrzebuję posty po wyciągnięciu obiektu User. Wygląda na to że ta metoda nie aktualizuje obiektów User,
+        //dodaje posty przez PostRepository
         Post post = convertToEntity(postDto);
 
         if (post.getRecipe() == null) throw new ResourceNotFoundException("Post Recipe cannot be null");

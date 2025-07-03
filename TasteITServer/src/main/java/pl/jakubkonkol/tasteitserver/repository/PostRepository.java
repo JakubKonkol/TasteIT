@@ -60,4 +60,7 @@ public interface PostRepository extends MongoRepository<Post, String> {
     List<Post> findTop100ByOrderByCreatedDateDescExcludingUser(String userId);
 
     List<Post> findAll();
+
+    @Query("{ 'userId' : ?0 }")
+    List<Post> findByUserId(String userId);
 }

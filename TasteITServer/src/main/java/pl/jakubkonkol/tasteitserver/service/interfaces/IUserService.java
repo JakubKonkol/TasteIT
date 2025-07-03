@@ -18,7 +18,7 @@ public interface IUserService {
     PageDto<UserReturnDto> getFollowers(String userId, String sessionToken, Integer page, Integer size);
     PageDto<UserReturnDto> getFollowing(String userId, String sessionToken, Integer page, Integer size);
     PageDto<UserReturnDto> searchUsersByDisplayName(String query, String sessionToken, Integer page, Integer size);
-    User getUserById(String userId);
+    User getSimpleUserById(String userId);
     User getCurrentUserBySessionToken(String sessionToken);
     void checkIfUserExists(String userId);
     User saveUser(User user);

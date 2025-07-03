@@ -20,7 +20,8 @@ public class UserController {
     private final IPostService postService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserReturnDto> getUserById(@PathVariable String userId, @RequestHeader("Authorization") String sessionToken) {
+    public ResponseEntity<UserReturnDto> getUserById(@PathVariable String userId,
+                                                     @RequestHeader("Authorization") String sessionToken) {
         var user = userService.getUserDtoById(userId, sessionToken);
         return ResponseEntity.ok(user);
     }
